@@ -10,11 +10,13 @@ const { Pool } = pg;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const isRender = !!process.env.RENDER;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgres://postgres:cashland@127.0.0.1:5432/cashland',
   max: 10,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 5_000,
+  ssl: isRender ? { rejectUnauthorized: false } : false,
 });
 
 pool.on('error', (err) => {
