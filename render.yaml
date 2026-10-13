@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: cashland-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /health
+    autoDeploy: true
