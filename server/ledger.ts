@@ -144,38 +144,67 @@ export async function creditDeposit(params: {
   amountKobo: bigint;
   txId?: string;
   reference: string;
+  note?: string;
 }): Promise<PostResult> {
-  const { userId, amountKobo, reference } = params;
-  const txId = params.txId ?? generateTxId();
+  const { userId, amountKobo, reference, note } = params;
+  if (amountKobo <= 0n) throw new Error('Amount must be positive');
+  if (!reference.trim()) throw new Error('Deposit reference is required');
 
-  // Ensure user has NGN account
+  const txId = params.txId ?? generateTxId();
   const { ngn } = await ensureAccounts(userId);
 
-  // Record transaction
-  await query(
-    `INSERT INTO transactions (id, type, status, recipient_id, amount_ngn, reference, completed_at)
-     VALUES ($1, 'deposit', 'completed', $2, $3, $4, NOW())
-     ON CONFLICT (reference) DO NOTHING`,
-    [txId, String(userId), String(amountKobo), reference]
-  );
+  // Transaction record and ledger credit are one DB transaction. A duplicate
+  // payment reference must never create another ledger entry.
+  const posted = await withTransaction(async (q) => {
+    await q(`SELECT id FROM accounts WHERE id = $1 FOR UPDATE`, [String(ngn.id)]);
 
-  // For prototype: directly insert a credit without a matching debit
-  // (in production the debit would come from a real float account)
-  const balanceBefore = await getBalance(ngn.id);
-  const balanceAfter = balanceBefore + amountKobo;
+    const inserted = await q<{ id: string }>(
+      `INSERT INTO transactions (id, type, status, recipient_id, amount_ngn, reference, note, completed_at)
+       VALUES ($1, 'deposit', 'completed', $2, $3, $4, $5, NOW())
+       ON CONFLICT (reference) DO NOTHING
+       RETURNING id`,
+      [txId, String(userId), String(amountKobo), reference, note ?? null]
+    );
 
-  await query(
-    `INSERT INTO ledger_entries (account_id, transaction_id, amount, direction, balance_after)
-     VALUES ($1, $2, $3, 'credit', $4)`,
-    [String(ngn.id), txId, String(amountKobo), String(balanceAfter)]
-  );
+    if (inserted.length === 0) return null;
 
-  await query(
-    `UPDATE transactions SET status='completed', completed_at=NOW() WHERE id=$1`,
-    [txId]
-  );
+    const balanceRow = await q<{ balance: string }>(
+      `SELECT COALESCE(SUM(CASE WHEN direction='credit' THEN amount ELSE -amount END), 0) AS balance
+       FROM ledger_entries WHERE account_id = $1`,
+      [String(ngn.id)]
+    );
+    const balanceAfter = BigInt(balanceRow[0]?.balance ?? '0') + amountKobo;
 
-  return { txId, debitBalanceAfter: 0n, creditBalanceAfter: balanceAfter };
+    await q(
+      `INSERT INTO ledger_entries (account_id, transaction_id, amount, direction, balance_after)
+       VALUES ($1, $2, $3, 'credit', $4)`,
+      [String(ngn.id), txId, String(amountKobo), String(balanceAfter)]
+    );
+
+    return { txId, balanceAfter };
+  });
+
+  if (!posted) {
+    // Return the existing transaction state without posting any additional credit.
+    const existing = await queryOne<{ id: string; recipient_id: string }>(
+      `SELECT id, recipient_id FROM transactions WHERE reference = $1`,
+      [reference]
+    );
+    if (!existing || existing.recipient_id !== String(userId)) {
+      throw new Error('DEPOSIT_REFERENCE_CONFLICT');
+    }
+    return {
+      txId: existing.id,
+      debitBalanceAfter: 0n,
+      creditBalanceAfter: await getBalance(ngn.id),
+    };
+  }
+
+  return {
+    txId: posted.txId,
+    debitBalanceAfter: 0n,
+    creditBalanceAfter: posted.balanceAfter,
+  };
 }
 
 // ─── TRANSFER (send money) ────────────────────────────────────────────────────
