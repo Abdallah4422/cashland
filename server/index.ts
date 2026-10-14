@@ -26,7 +26,6 @@ import { sendSms } from './sms.js';
 import { dojahVerifyBvn, dojahVerifyNin } from './dojah.js';
 import { getUserWallets } from './settlement.js';
 import { getFxRateMeta } from './fxrate.js';
-import type { Address } from 'viem';
 
 const PORT = 3001;
 
