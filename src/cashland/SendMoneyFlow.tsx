@@ -5,7 +5,7 @@ import { pushSentNotification } from './useNotifications';
 import { ConnectKitButton } from 'connectkit';
 import { useAccount } from 'wagmi';
 import { isAddress } from 'viem';
-import { glass, brandGradient, formatNaira, contacts } from './design';
+import { glass, navyGradient, brandGradient, formatNaira, contacts } from './design';
 import { Avatar } from './HomeScreen';
 import { useUsdcBalance, ngnToUsdc } from './useUsdcBalance';
 import { useUsdcTransfer } from './useUsdcTransfer';
@@ -473,7 +473,7 @@ function ReceiptStep({ amount, txHash, explorerUrl, confirmedAt, onProof, onClos
   return (
     <div className="flex flex-col min-h-full">
       <div className="rounded-3xl overflow-hidden mb-4" style={{ ...glass.receipt, background: 'white' }}>
-        <div className="px-5 py-5 text-center" style={{ background: brandGradient }}>
+        <div className="px-5 py-5 text-center" style={{ background: navyGradient }}>
           <div className="flex items-center justify-center gap-2 mb-1">
             <svg width="20" height="20" viewBox="0 0 44 44" fill="none">
               <path d="M22 4C12.06 4 4 12.06 4 22C4 31.94 12.06 40 22 40C31.94 40 40 31.94 40 22C40 12.06 31.94 4 22 4Z" fill="rgba(255,255,255,0.9)"/>
@@ -529,7 +529,7 @@ function ReceiptStep({ amount, txHash, explorerUrl, confirmedAt, onProof, onClos
             <ExternalLink size={14} /> Open in explorer
           </a>
         )}
-        <button onClick={onClose} className="w-full py-4 rounded-2xl text-base font-semibold text-white" style={{ background: brandGradient }}>
+        <button onClick={onClose} className="w-full py-4 rounded-2xl text-base font-semibold text-white" style={{ background: navyGradient }}>
           Done
         </button>
       </div>

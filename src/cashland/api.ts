@@ -2,7 +2,7 @@
 // All calls go through /api/* which Vite proxies to the backend on port 3001.
 // The session token is stored in localStorage alongside the session data.
 
-const BASE = '/api';
+const BASE: string = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
 
 function getToken(): string | null {
   try {

@@ -4,27 +4,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Arc Light + Cashland tokens ─────────────────────────────── */
 :root {
-  --brand: #00A86B;
-  --brand-dark: #007A4D;
-  --brand-light: #E6F7F1;
-  --brand-mid: #00C47D;
-  --ink: #0D1B12;
-  --ink-2: #1A2E22;
-  --subtle: #4A6358;
-  --muted: #8BA396;
-  --surface: #F4FAF7;
-  --surface-2: #EAEFE7;
-  --border: rgba(0, 168, 107, 0.14);
-  --error: #E53E3E;
-  --warning: #D97706;
-  --success: #00A86B;
-  --white: #FFFFFF;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 8px 32px rgba(0,0,0,0.10);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,0.14);
+  /* Arc Light canvas */
+  --bg:               #ffffff;
+  --bg-gradient:      linear-gradient(180deg, #f9f9fc 0%, #fffcf7 52%, #fbf7f2 100%);
+
+  /* Surfaces */
+  --surface:          rgba(255, 255, 255, 0.72);
+  --surface-strong:   rgba(255, 255, 255, 0.92);
+  --surface-muted:    #f5f5f8;
+  --surface-2:        #f0f0f4;
+
+  /* Ink */
+  --ink:              #122d45;
+  --ink-2:            #334155;
+  --muted:            #6b6580;
+  --subtle:           #8a849c;
+
+  /* Borders */
+  --border:           rgba(18, 45, 69, 0.10);
+  --border-strong:    rgba(25, 53, 77, 0.45);
+
+  /* Arc primary CTA — dark navy */
+  --accent:           #122d45;
+  --accent-hover:     #1061a6;
+  --focus:            #85b1ed;
+
+  /* Cashland brand green — semantic only (success, verified, onchain) */
+  --brand:            #00a86b;
+  --brand-dark:       #007a4d;
+  --brand-light:      #e6f7f1;
+  --brand-mid:        #00c47d;
+
+  /* Semantic */
+  --success:          #1a8047;
+  --danger:           #ba2b4c;
+  --warning:          #c05621;
+  --error:            #ba2b4c;
+  --white:            #ffffff;
+
+  /* Shadows — warmer, Arc-style */
+  --shadow-sm:        0 2px 8px rgba(18, 45, 69, 0.06);
+  --shadow-md:        0 8px 32px rgba(18, 45, 69, 0.10);
+  --shadow-lg:        0 20px 60px rgba(18, 45, 69, 0.14);
 }
 
+/* ── Reset ───────────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -34,40 +60,42 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: 'DM Sans', sans-serif;
-  background: #F4FAF7;
+  background: var(--bg-gradient);
+  min-height: 100dvh;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Typography helpers ──────────────────────────────────────── */
 .display {
   font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.03em;
 }
 
 .mono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', Menlo, monospace;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Scrollbar ───────────────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Number inputs ───────────────────────────────────────────── */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Hide scrollbar utility */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Toast overrides */
+/* ── Toast ───────────────────────────────────────────────────── */
 [data-sonner-toaster] {
   font-family: 'DM Sans', sans-serif !important;
 }

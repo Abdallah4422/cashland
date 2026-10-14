@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Share2, Copy, Check, QrCode, Download, AlertTriangle } from 'lucide-react';
-import { glass, brandGradient, formatNaira } from './design';
+import { glass, brandGradient, formatNaira }  from './design';
 import { Avatar } from './HomeScreen';
 
 interface Props {

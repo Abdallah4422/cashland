@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { brandGradient } from './design';
+import { navyGradient } from './design';
 
 interface Props {
   onDone: () => void;
@@ -15,7 +15,7 @@ export default function SplashScreen({ onDone }: Props) {
   return (
     <div
       className="fixed inset-0 flex flex-col items-center justify-center"
-      style={{ background: brandGradient }}
+      style={{ background: navyGradient }}
     >
       {/* Ambient blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

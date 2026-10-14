@@ -150,12 +150,12 @@ export default function MainApp({ onSignOut, backend }: { onSignOut?: () => void
                   <Icon
                     size={22}
                     className="relative"
-                    style={{ color: active ? 'var(--brand)' : 'var(--muted)', strokeWidth: active ? 2.2 : 1.8 }}
+                    style={{ color: active ? 'var(--accent)' : 'var(--muted)', strokeWidth: active ? 2.2 : 1.8 }}
                   />
                 </div>
                 <span
                   className="text-xs font-semibold relative"
-                  style={{ color: active ? 'var(--brand)' : 'var(--muted)' }}
+                  style={{ color: active ? 'var(--accent)' : 'var(--muted)' }}
                 >
                   {tab.label}
                 </span>

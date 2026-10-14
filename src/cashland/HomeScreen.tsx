@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, Plus, ArrowUpRight, ArrowDownLeft, Building2, CheckCircle2, ChevronRight, ShieldCheck, Wallet, RefreshCw, Smartphone, UserPlus, TrendingUp } from 'lucide-react';
 import { ConnectKitButton } from 'connectkit';
-import { glass, brandGradient, formatNaira, contacts } from './design';
+import { glass, navyGradient, formatNaira, contacts } from './design';
 import { useUsdcBalance } from './useUsdcBalance';
 import { NotificationBell } from './NotificationDrawer';
 import CurrencyToggle from './CurrencyToggle';
@@ -84,7 +84,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="relative px-5 pt-12 pb-6" style={{ background: brandGradient }}>
+      <div className="relative px-5 pt-12 pb-6" style={{ background: navyGradient }}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div style={{ position: 'absolute', top: '-20%', right: '-5%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)', filter: 'blur(40px)' }} />
         </div>

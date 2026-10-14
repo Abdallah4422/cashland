@@ -8,7 +8,7 @@ import {
   Shield, ChevronRight, Check, X, Lock, Eye, RefreshCw,
   AlertCircle, ExternalLink, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { glass, brandGradient } from './design';
+import { glass, navyGradient, brandGradient } from './design';
 
 export type ConsentScope =
   | 'account_info'       // Read account balance + basic info
@@ -99,7 +99,7 @@ export default function ConsentModal({ open, request, onApprove, onDecline }: Pr
           >
             <div className="rounded-t-[28px] overflow-hidden" style={{ ...glass.receipt, maxHeight: '90dvh', overflowY: 'auto' }}>
               {/* iGree-style header */}
-              <div className="px-5 pt-6 pb-4" style={{ background: brandGradient }}>
+              <div className="px-5 pt-6 pb-4" style={{ background: navyGradient }}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.25)' }}>

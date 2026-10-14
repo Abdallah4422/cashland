@@ -6,7 +6,7 @@ import {
   Wallet, ShieldCheck, Clock, Receipt, ExternalLink,
 } from 'lucide-react';
 import { useAccount } from 'wagmi';
-import { glass, brandGradient, formatNaira } from './design';
+import { glass, navyGradient, brandGradient, formatNaira } from './design';
 import { useUsdcBalance, NGN_PER_USDC } from './useUsdcBalance';
 import { pushDepositNotification } from './useNotifications';
 
@@ -49,7 +49,7 @@ function OnrampReceipt({
         className="rounded-3xl overflow-hidden mb-5"
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
       >
-        <div className="px-5 py-6 text-center" style={{ background: brandGradient }}>
+        <div className="px-5 py-6 text-center" style={{ background: navyGradient }}>
           <motion.div
             className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
             style={{ background: 'rgba(255,255,255,0.20)' }}
@@ -232,7 +232,7 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
     return (
       <div className="flex flex-col min-h-full px-5 pb-8">
         {/* Conversion summary */}
-        <div className="rounded-2xl p-4 mb-5 text-center" style={{ background: brandGradient }}>
+        <div className="rounded-2xl p-4 mb-5 text-center" style={{ background: navyGradient }}>
           <p className="text-white/70 text-xs mb-1">You're adding</p>
           <p className="display text-3xl font-bold text-white tabular" style={{ letterSpacing: '-0.03em' }}>
             {formatNaira(parsedAmount)}
@@ -808,7 +808,7 @@ export default function AddMoneyScreen({ onClose, onDeposited }: Props) {
       <div className="relative z-10 flex-1 overflow-y-auto px-5 pb-8">
 
         {/* Exchange rate banner */}
-        <div className="rounded-2xl p-4 mb-5 flex items-center gap-3" style={{ background: brandGradient }}>
+        <div className="rounded-2xl p-4 mb-5 flex items-center gap-3" style={{ background: navyGradient }}>
           <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.20)' }}>
             <Receipt size={18} className="text-white" />
           </div>

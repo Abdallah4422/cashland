@@ -1,7 +1,7 @@
 import { useState, useRef, KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Phone, AtSign, User, Lock, Fingerprint, ShieldCheck, CheckCircle2, AlertCircle, CreditCard, Loader2 } from 'lucide-react';
-import { glass, brandGradient } from './design';
+import { glass, navyGradient, brandGradient } from './design';
 import { saveSession, hashPin } from './useUserSession';
 import type { BackendActions, BackendState } from './useBackend';
 
@@ -14,7 +14,7 @@ type Step = 'phone' | 'otp' | 'profile' | 'kyc' | 'pin' | 'pin-confirm' | 'biome
 
 const CashlandLogo = () => (
   <div className="flex items-center gap-2">
-    <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: brandGradient }}>
+    <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: navyGradient }}>
       <svg width="18" height="18" viewBox="0 0 44 44" fill="none">
         <path d="M22 6C13.16 6 6 13.16 6 22C6 30.84 13.16 38 22 38C30.84 38 38 30.84 38 22C38 13.16 30.84 6 22 6Z" fill="white"/>
         <path d="M27.5 16.5H19C17.9 16.5 17 17.4 17 18.5V19.5C17 20.6 17.9 21.5 19 21.5H25C26.1 21.5 27 22.4 27 23.5V25.5C27 26.6 26.1 27.5 25 27.5H16.5" stroke="#00A86B" strokeWidth="2.5" strokeLinecap="round"/>
@@ -591,7 +591,7 @@ export default function RegistrationFlow({ onComplete, backend }: Props) {
         <div className="h-1 rounded-full" style={{ background: 'rgba(0,168,107,0.15)' }}>
           <motion.div
             className="h-full rounded-full"
-            style={{ background: brandGradient }}
+            style={{ background: navyGradient }}
             animate={{ width: `${progress * 100}%` }}
             transition={{ type: 'spring', stiffness: 200, damping: 30 }}
           />

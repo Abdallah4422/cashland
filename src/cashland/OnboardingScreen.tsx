@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Smartphone, ShieldCheck, Wallet } from 'lucide-react';
-import { brandGradient, glass } from './design';
+import { glass, brandGradient } from './design';
 
 interface Props {
   onGetStarted: () => void;

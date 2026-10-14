@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, ChevronLeft, Clock, PlusCircle, List } from 'lucide-react';
-import { glass, brandGradient, formatNaira } from './design';
+import { glass, navyGradient, brandGradient, formatNaira } from './design';
 
 interface Props {
   onClose: () => void;
@@ -327,7 +327,7 @@ export default function SafePayScreen({ onClose }: Props) {
               <button
                 onClick={() => setStep('create')}
                 className="w-full mt-4 py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98]"
-                style={{ background: brandGradient }}
+                style={{ background: navyGradient }}
               >
                 Create new SafePay
               </button>

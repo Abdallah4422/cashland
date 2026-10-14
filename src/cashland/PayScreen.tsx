@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QrCode, AtSign, ShieldCheck, Link2, ChevronLeft, CheckCircle2, Scan, Zap, Lock, Search, MapPin, Tag, Phone, WifiOff } from 'lucide-react';
-import { glass, brandGradient, formatNaira } from './design';
+import { glass, brandGradient, formatNaira }  from './design';
 import SafePayScreen from './SafePayScreen';
 import { MERCHANTS, CATEGORIES, type Merchant } from './merchants';
 

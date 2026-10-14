@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, ArrowUpRight, ArrowDownLeft, Plus, Info, Trash2, BellOff } from 'lucide-react';
 import { useNotifications, type CashlandNotification, type NotifType } from './useNotifications';
-import { glass, brandGradient } from './design';
+import { glass, navyGradient } from './design';
 
 // ── Bell icon with badge ──────────────────────────────────────
 
@@ -122,7 +122,7 @@ function PermissionPrompt({ onAllow, onDismiss }: { onAllow: () => void; onDismi
         <button
           onClick={onAllow}
           className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
-          style={{ background: brandGradient }}
+          style={{ background: navyGradient }}
         >
           Allow
         </button>
