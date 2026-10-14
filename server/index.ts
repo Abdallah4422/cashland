@@ -8,7 +8,7 @@
 //   - Paystack webhook with real HMAC-SHA512 signature verification
 //   - Wallet address registration for USDC sync
 
-import { createHmac } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { runMigrations, query, queryOne } from './db.js';
 import {
   sendOtp, verifyOtp, registerUser, loginWithPin,
@@ -244,15 +244,10 @@ async function handle(req: Request): Promise<Response> {
       }
 
       const body = await parseBody(req);
-      const walletAddress = str(body.walletAddress) as Address;
-      if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
-        return err('Invalid wallet address');
-      }
-
-      // Auto-register wallet on first sync
-      await registerWallet(user.id, walletAddress);
-      const result = await syncUsdcToLedger({ userId: user.id, walletAddress });
-      return json(result);
+      // Disabled until wallet ownership is cryptographically proven and deposits
+      // are reconciled from verified on-chain events. A caller-supplied address
+      // plus balanceOf() is not sufficient proof of a deposit.
+      return err('USDC sync is temporarily disabled pending wallet ownership and deposit verification.', 503);
     }
 
     // ── TRANSACTIONS ──────────────────────────────────────────────────────────
@@ -277,8 +272,12 @@ async function handle(req: Request): Promise<Response> {
 
       const body = await parseBody(req);
       const { recipientTag, recipientPhone, amountNgn, note } = body;
-
-      const amountKobo = BigInt(Math.round(Number(amountNgn) * 100));
+      const parsedAmountNgn = Number(amountNgn);
+      if (!Number.isFinite(parsedAmountNgn) || parsedAmountNgn <= 0 ||
+          !Number.isSafeInteger(Math.round(parsedAmountNgn * 100))) {
+        return err('Amount must be a valid positive amount');
+      }
+      const amountKobo = BigInt(Math.round(parsedAmountNgn * 100));
 
       // Enforce tier limits (server-side)
       const tierLimits: Record<number, bigint> = { 1: 5_000_000n, 2: 50_000_000n, 3: 9_999_999_999n };
@@ -353,14 +352,9 @@ async function handle(req: Request): Promise<Response> {
     if (method === 'POST' && path === '/transactions/deposit') {
       const user = await requireAuth(req);
       if (!user) return err('Unauthorized', 401);
-      const body = await parseBody(req);
-      const amountNgn = Number(body.amountNgn);
-      if (!amountNgn || amountNgn < 100) return err('Minimum deposit is ₦100');
-      const amountKobo = BigInt(Math.round(amountNgn * 100));
-      const reference = 'DEP-' + nanoid(10);
-      const liveRate = await getLiveNgnPerUsdc();
-      const result = await creditDeposit({ userId: user.id, amountKobo, reference, note: `Fiat deposit @ ₦${liveRate}/USDC` });
-      return json({ txId: result.txId, reference, newBalance: { naira: Number(result.creditBalanceAfter) / 100 } });
+      // Never credit a ledger from a client-supplied amount. Deposits must be
+      // credited only by a verified payment-provider webhook.
+      return err('Direct deposits are disabled. Complete a verified payment-provider checkout instead.', 410);
     }
 
     if (method === 'POST' && path === '/transactions/withdraw') {
@@ -374,8 +368,13 @@ async function handle(req: Request): Promise<Response> {
 
       const body = await parseBody(req);
       const { amountNgn, bankName, accountNumber, accountName } = body;
-      if (!amountNgn || !bankName || !accountNumber || !accountName) return err('Missing required fields');
-      const amountKobo = BigInt(Math.round(Number(amountNgn) * 100));
+      if (amountNgn === undefined || !bankName || !accountNumber || !accountName) return err('Missing required fields');
+      const parsedAmountNgn = Number(amountNgn);
+      if (!Number.isFinite(parsedAmountNgn) || parsedAmountNgn <= 0 ||
+          !Number.isSafeInteger(Math.round(parsedAmountNgn * 100))) {
+        return err('Amount must be a valid positive amount');
+      }
+      const amountKobo = BigInt(Math.round(parsedAmountNgn * 100));
       const reference = 'WDR-' + nanoid(10);
       try {
         const result = await debitWithdrawal({
@@ -503,18 +502,20 @@ async function handle(req: Request): Promise<Response> {
       const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
       const { text: rawBody, parsed: body } = await parseRawBody(req);
 
-      // Verify Paystack HMAC-SHA512 signature
-      if (paystackSecret) {
-        const signature = req.headers.get('x-paystack-signature') ?? '';
-        const expectedSig = createHmac('sha512', paystackSecret)
-          .update(rawBody)
-          .digest('hex');
-        if (signature !== expectedSig) {
-          console.warn('[webhook:paystack] Invalid signature');
-          return err('Invalid signature', 400);
-        }
-      } else {
-        console.warn('[webhook:paystack] PAYSTACK_SECRET_KEY not set — skipping signature verification (dev mode)');
+      // Fail closed: never process financial webhooks without a configured secret.
+      if (!paystackSecret) {
+        console.error('[webhook:paystack] PAYSTACK_SECRET_KEY is not configured');
+        return err('Payment webhook is not configured', 503);
+      }
+      const signature = req.headers.get('x-paystack-signature') ?? '';
+      const expectedSig = createHmac('sha512', paystackSecret)
+        .update(rawBody)
+        .digest('hex');
+      const supplied = /^[a-f0-9]{128}$/i.test(signature) ? Buffer.from(signature, 'hex') : Buffer.alloc(0);
+      const expected = Buffer.from(expectedSig, 'hex');
+      if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
+        console.warn('[webhook:paystack] Invalid signature');
+        return err('Invalid signature', 400);
       }
 
       const event = body as {
@@ -530,7 +531,10 @@ async function handle(req: Request): Promise<Response> {
 
       if (event.event === 'charge.success' && event.data?.status === 'success') {
         const { reference, amount, metadata } = event.data;
-        if (!reference || !amount) return err('Invalid webhook payload');
+        if (typeof reference !== 'string' || !reference.trim() ||
+            !Number.isSafeInteger(amount) || amount <= 0) {
+          return err('Invalid webhook payload');
+        }
 
         // Idempotency check
         const existing = await queryOne(`SELECT id FROM transactions WHERE reference = $1`, [reference]);
@@ -542,6 +546,7 @@ async function handle(req: Request): Promise<Response> {
           return json({ ok: true, unmatched: true });
         }
 
+        if (!/^\d+$/.test(userIdStr)) return err('Invalid payment metadata');
         const userId = BigInt(userIdStr);
         const amountKobo = BigInt(amount); // Paystack sends in kobo
         await creditDeposit({ userId, amountKobo, reference });
