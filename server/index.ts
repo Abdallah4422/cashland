@@ -216,13 +216,9 @@ async function handle(req: Request): Promise<Response> {
     if (method === 'POST' && path === '/account/wallet') {
       const user = await requireAuth(req);
       if (!user) return err('Unauthorized', 401);
-      const body = await parseBody(req);
-      const walletAddress = str(body.walletAddress) as Address;
-      if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
-        return err('Invalid wallet address');
-      }
-      await registerWallet(user.id, walletAddress);
-      return json({ registered: true, walletAddress });
+      // Do not associate an arbitrary address with an account until the user
+      // proves control with a signed challenge.
+      return err('Wallet registration is temporarily disabled pending ownership verification.', 503);
     }
 
     if (method === 'GET' && path === '/account/wallets') {
