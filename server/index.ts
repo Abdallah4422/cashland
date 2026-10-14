@@ -17,15 +17,15 @@ import {
 } from './auth.js';
 import {
   getBalanceByUser, getTransactions, transferNgn,
-  creditDeposit, debitWithdrawal
+  creditDeposit
 } from './ledger.js';
 import { verifyBvn, verifyNin } from './kyc.js';
 import { sha256, generateDisputeRef, nanoid } from './crypto.js';
 import { rateLimitExceeded, checkVelocity } from './ratelimit.js';
 import { sendSms } from './sms.js';
 import { dojahVerifyBvn, dojahVerifyNin } from './dojah.js';
-import { syncUsdcToLedger, registerWallet, getUserWallets } from './settlement.js';
-import { getLiveNgnPerUsdc, getFxRateMeta } from './fxrate.js';
+import { getUserWallets } from './settlement.js';
+import { getFxRateMeta } from './fxrate.js';
 import type { Address } from 'viem';
 
 const PORT = 3001;
@@ -274,6 +274,7 @@ async function handle(req: Request): Promise<Response> {
         return err('Amount must be a valid positive amount');
       }
       const amountKobo = BigInt(Math.round(parsedAmountNgn * 100));
+      if (amountKobo <= 0n) return err('Amount must be at least ₦0.01');
 
       // Enforce tier limits (server-side)
       const tierLimits: Record<number, bigint> = { 1: 5_000_000n, 2: 50_000_000n, 3: 9_999_999_999n };
@@ -356,32 +357,9 @@ async function handle(req: Request): Promise<Response> {
     if (method === 'POST' && path === '/transactions/withdraw') {
       const user = await requireAuth(req);
       if (!user) return err('Unauthorized', 401);
-
-      // Rate limit: 5 withdrawals per user per hour
-      if (rateLimitExceeded(`withdraw:${String(user.id)}`, 5, 60 * 60 * 1000)) {
-        return err('Withdrawal limit reached. Please try again later.', 429);
-      }
-
-      const body = await parseBody(req);
-      const { amountNgn, bankName, accountNumber, accountName } = body;
-      if (amountNgn === undefined || !bankName || !accountNumber || !accountName) return err('Missing required fields');
-      const parsedAmountNgn = Number(amountNgn);
-      if (!Number.isFinite(parsedAmountNgn) || parsedAmountNgn <= 0 ||
-          !Number.isSafeInteger(Math.round(parsedAmountNgn * 100))) {
-        return err('Amount must be a valid positive amount');
-      }
-      const amountKobo = BigInt(Math.round(parsedAmountNgn * 100));
-      const reference = 'WDR-' + nanoid(10);
-      try {
-        const result = await debitWithdrawal({
-          userId: user.id, amountKobo, reference,
-          bankName: str(bankName), accountNumber: str(accountNumber), accountName: str(accountName),
-        });
-        return json({ txId: result.txId, reference, newBalance: { naira: Number(result.newBalance) / 100 } });
-      } catch (e) {
-        if (e instanceof Error && e.message === 'INSUFFICIENT_FUNDS') return err('Insufficient balance', 400);
-        throw e;
-      }
+      // Do not debit user balances until a real payout provider, beneficiary
+      // verification, and payout-status reconciliation are implemented.
+      return err('Withdrawals are temporarily disabled pending verified payout integration.', 503);
     }
 
     // ── KYC (Phase 2 — real Dojah integration with mock fallback) ─────────────
