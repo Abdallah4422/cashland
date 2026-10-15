@@ -30,6 +30,3 @@ traces.jsonl
 # OS
 .DS_Store
 Thumbs.db
-
-# Bun
-.bun-version
