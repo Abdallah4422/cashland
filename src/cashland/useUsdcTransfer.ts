@@ -1,10 +1,9 @@
 import { useWriteContract, useWaitForTransactionReceipt, useAccount, useSwitchChain } from 'wagmi';
 import { erc20Abi, isAddress } from 'viem';
-import { arcTestnet } from 'viem/chains';
 import { getUsdc, buildTxExplorerUrl } from '@/onchain-facts';
 import { parseAmount } from '@/onchain-money';
 
-const CHAIN_ID = arcTestnet.id;
+const CHAIN_ID = 5042; // Arc Mainnet
 const usdcFact = getUsdc(CHAIN_ID);
 
 export type TransferStatus =

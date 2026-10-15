@@ -1,10 +1,9 @@
 import { useReadContract, useAccount } from 'wagmi';
 import { erc20Abi } from 'viem';
-import { arcTestnet } from 'viem/chains';
 import { getUsdc } from '@/onchain-facts';
 import { Amount, usdcDecimalsFor } from '@/onchain-money';
 
-const CHAIN_ID = arcTestnet.id;
+const CHAIN_ID = 5042; // Arc Mainnet
 const usdcFact = getUsdc(CHAIN_ID);
 
 // Prototype NGN/USD rate — labelled clearly in UI
