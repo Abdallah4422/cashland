@@ -1,4 +1,4 @@
-# [App Name]
+# Cashland
 
 > Built with Arc Studio - money-powered apps in minutes
 
@@ -8,7 +8,23 @@ This is the **project memory** - what Arc Studio remembers about building this a
 
 ## What This App Does
 
-[Brief description of what the app does and its primary use case]
+Cashland is a Nigerian-first onchain payment wallet. Users send and receive money using phone numbers, CashTags (@musa), QR codes, or wallet addresses. Money is displayed in Nigerian Naira (NGN). Blockchain settlement runs invisibly underneath using USDC on Arc Testnet.
+
+## Deployed Contracts
+
+| Contract | Network | Address | Explorer |
+|---|---|---|---|
+| CashlandSafePay | Arc Testnet | 0x6633247663f5df37d422f2957e986df2f5f1fe55 | https://explorer.testnet.arc.io/address/0x6633247663f5df37d422f2957e986df2f5f1fe55 |
+
+## Backend
+
+- Render: https://db-url-sh27.onrender.com
+- Database: Render PostgreSQL (cashland-db)
+- GitHub: https://github.com/Abdallah4422/cashland
+
+## Live Deployment
+
+- Netlify: https://keen-profiterole-67c97a.netlify.app
 
 ## Tech Stack
 
