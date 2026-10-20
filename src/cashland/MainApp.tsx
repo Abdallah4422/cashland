@@ -65,12 +65,12 @@ export default function MainApp({ onSignOut, backend }: { onSignOut?: () => void
   return (
     <div
       className="relative min-h-dvh overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 50%, #F4FAF7 100%)' }}
+      style={{ background: 'linear-gradient(180deg, #f9f9fc 0%, #fffcf7 52%, #fbf7f2 100%)' }}
     >
       {/* Ambient background blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div style={{ position: 'absolute', top: '0%', right: '-5%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,168,107,0.12) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        <div style={{ position: 'absolute', bottom: '15%', left: '-5%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(91,108,246,0.07) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        <div style={{ position: 'absolute', top: '0%', right: '-5%', width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(18,45,69,0.06) 0%, transparent 70%)', filter: 'blur(80px)' }} />
+        <div style={{ position: 'absolute', bottom: '15%', left: '-8%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,168,107,0.05) 0%, transparent 70%)', filter: 'blur(80px)' }} />
       </div>
 
       {/* Main content */}
@@ -136,26 +136,27 @@ export default function MainApp({ onSignOut, backend }: { onSignOut?: () => void
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="flex-1 flex flex-col items-center justify-center gap-1 transition-all active:scale-95"
+                className="flex-1 flex flex-col items-center justify-center gap-1 transition-all active:scale-90"
                 style={{ minHeight: 44 }}
               >
-                <div className="relative">
+                <div className="relative flex items-center justify-center">
                   {active && (
                     <motion.div
                       layoutId="tab-bg"
                       className="absolute"
-                      style={{ background: 'rgba(0,168,107,0.12)', borderRadius: 10, top: -6, bottom: -6, left: -10, right: -10 }}
+                      style={{ background: 'rgba(0,168,107,0.13)', borderRadius: 12, top: -7, bottom: -7, left: -12, right: -12 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 40 }}
                     />
                   )}
                   <Icon
-                    size={22}
+                    size={21}
                     className="relative"
-                    style={{ color: active ? 'var(--accent)' : 'var(--muted)', strokeWidth: active ? 2.2 : 1.8 }}
+                    style={{ color: active ? '#00a86b' : '#94a3b8', strokeWidth: active ? 2.3 : 1.7 }}
                   />
                 </div>
                 <span
                   className="text-xs font-semibold relative"
-                  style={{ color: active ? 'var(--accent)' : 'var(--muted)' }}
+                  style={{ color: active ? '#00a86b' : '#94a3b8', fontSize: 10 }}
                 >
                   {tab.label}
                 </span>

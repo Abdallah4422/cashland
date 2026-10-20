@@ -40,9 +40,15 @@ function Avatar({ initials, color, size = 44 }: { initials: string; color: strin
 }
 export { Avatar };
 
+function getGreeting(): string {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+}
+
 export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, onBills, onInvite, onOpenNotifications, liveBalance, userName }: Props) {
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [currency, setCurrency] = useState<Currency>(loadCurrencyPref);
+  const greeting = getGreeting();
   const { isConnected, isLoading, usdcFloat, refetch } = useUsdcBalance();
   const { rates, updatedAt, isRefreshing, refresh } = useFxRates();
 
@@ -90,7 +96,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
         </div>
         <div className="relative flex items-start justify-between mb-6">
           <div>
-            <p className="text-white/70 text-sm font-medium mb-0.5">Good evening</p>
+            <p className="text-white/65 text-sm font-medium mb-0.5">{greeting}</p>
             <h1 className="display text-2xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
               {userName ?? 'Musa Ibrahim'}
             </h1>
@@ -219,13 +225,20 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
 
       {/* Quick actions */}
       <div className="px-5 -mt-1 mb-6">
-        <div className="grid grid-cols-4 gap-3 pt-5">
+        <div className="grid grid-cols-4 gap-2.5 pt-5">
           {quickActions.map(({ label, icon: Icon, onClick, color, bg }) => (
-            <button key={label} onClick={onClick} className="flex flex-col items-center gap-2 transition-all active:scale-95">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: bg, boxShadow: `0 4px 12px ${color}25` }}>
-                <Icon size={22} style={{ color }} />
+            <button key={label} onClick={onClick} className="flex flex-col items-center gap-2 transition-all active:scale-90">
+              <div
+                className="w-[58px] h-[58px] rounded-2xl flex items-center justify-center"
+                style={{
+                  background: bg,
+                  boxShadow: `0 4px 16px ${color}28, 0 1px 3px rgba(0,0,0,0.06)`,
+                  border: `1px solid ${color}18`,
+                }}
+              >
+                <Icon size={23} style={{ color, strokeWidth: 2 }} />
               </div>
-              <span className="text-xs font-semibold text-center leading-tight" style={{ color: 'var(--ink)' }}>{label}</span>
+              <span className="text-xs font-semibold text-center leading-tight" style={{ color: 'var(--ink)', fontSize: 11 }}>{label}</span>
             </button>
           ))}
         </div>
