@@ -12,6 +12,12 @@ Cashland is a Nigerian-first onchain payment wallet. Users send and receive mone
 
 ## Deployed Contracts
 
+### CashlandSafePay (Arc Mainnet)
+- Address: `0x75d9f3fbd8290620b41693de2b8807ed8bec1ca5`
+- Network: Arc Mainnet (Chain ID 5042)
+- USDC: `0x3600000000000000000000000000000000000000`
+- Explorer: https://explorer.arc.io/address/0x75d9f3fbd8290620b41693de2b8807ed8bec1ca5
+
 | Contract | Network | Address | Explorer |
 |---|---|---|---|
 | CashlandSafePay | Arc Testnet | 0x6633247663f5df37d422f2957e986df2f5f1fe55 | https://explorer.testnet.arc.io/address/0x6633247663f5df37d422f2957e986df2f5f1fe55 |

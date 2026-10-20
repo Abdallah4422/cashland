@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, ChevronLeft, Clock, PlusCircle, List } from 'lucide-react';
 import { glass, navyGradient, brandGradient, formatNaira } from './design';
 
-// CashlandSafePay contract deployed on Arc Testnet
-export const SAFEPAY_CONTRACT_ADDRESS = '0x6633247663f5df37d422f2957e986df2f5f1fe55' as const;
+// CashlandSafePay contract deployed on Arc Mainnet
+export const SAFEPAY_CONTRACT_ADDRESS = '0x75d9f3fbd8290620b41693de2b8807ed8bec1ca5' as const;
 
 interface Props {
   onClose: () => void;
