@@ -15,12 +15,12 @@ export default function SplashScreen({ onDone }: Props) {
   return (
     <div
       className="fixed inset-0 flex flex-col items-center justify-center"
-      style={{ background: navyGradient }}
+      style={{ background: 'linear-gradient(160deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}
     >
       {/* Ambient blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div style={{ position: 'absolute', top: '10%', left: '5%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        <div style={{ position: 'absolute', bottom: '10%', right: '5%', width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)', filter: 'blur(50px)' }} />
+        <div style={{ position: 'absolute', top: '10%', left: '5%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,196,125,0.15) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        <div style={{ position: 'absolute', bottom: '10%', right: '5%', width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,140,248,0.10) 0%, transparent 70%)', filter: 'blur(50px)' }} />
       </div>
 
       <motion.div

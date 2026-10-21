@@ -53,10 +53,10 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
   const { rates, updatedAt, isRefreshing, refresh } = useFxRates();
 
   const quickActions = [
-    { label: 'Add Money', icon: Plus, onClick: onAddMoney, color: '#00A86B', bg: '#E6F7F1' },
-    { label: 'Send', icon: ArrowUpRight, onClick: onSend, color: '#5B6CF6', bg: '#EEF0FE' },
-    { label: 'Receive', icon: ArrowDownLeft, onClick: onReceive, color: '#D97706', bg: '#FEF3C7' },
-    { label: 'Withdraw', icon: Building2, onClick: onWithdraw, color: '#EC4899', bg: '#FEE2EF' },
+    { label: 'Add Money', icon: Plus, onClick: onAddMoney, color: '#00c47d', bg: 'rgba(0,196,125,0.15)', glow: 'rgba(0,196,125,0.3)' },
+    { label: 'Send', icon: ArrowUpRight, onClick: onSend, color: '#818cf8', bg: 'rgba(129,140,248,0.15)', glow: 'rgba(129,140,248,0.3)' },
+    { label: 'Receive', icon: ArrowDownLeft, onClick: onReceive, color: '#fbbf24', bg: 'rgba(251,191,36,0.15)', glow: 'rgba(251,191,36,0.3)' },
+    { label: 'Withdraw', icon: Building2, onClick: onWithdraw, color: '#f472b6', bg: 'rgba(244,114,182,0.15)', glow: 'rgba(244,114,182,0.3)' },
   ];
 
   // If we have a live backend balance in NGN, prefer that. Otherwise fall back to USDC onchain.
@@ -90,7 +90,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="relative px-5 pt-12 pb-6" style={{ background: navyGradient }}>
+      <div className="relative px-5 pt-12 pb-6" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0c1c32 100%)' }}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div style={{ position: 'absolute', top: '-20%', right: '-5%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)', filter: 'blur(40px)' }} />
         </div>
@@ -125,7 +125,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
         </div>
 
         {/* Balance Card */}
-        <motion.div className="rounded-3xl p-5" style={{ ...glass.card, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        <motion.div className="rounded-3xl p-5" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.08) inset' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: 'var(--subtle)', letterSpacing: '0.08em' }}>
               Cashland Balance
@@ -224,19 +224,19 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
       <SocialFeedTicker />
 
       {/* Quick actions */}
-      <div className="px-5 -mt-1 mb-6">
-        <div className="grid grid-cols-4 gap-2.5 pt-5">
-          {quickActions.map(({ label, icon: Icon, onClick, color, bg }) => (
+      <div className="px-5 -mt-1 mb-5">
+        <div className="grid grid-cols-4 gap-3 pt-5">
+          {quickActions.map(({ label, icon: Icon, onClick, color, bg, glow }) => (
             <button key={label} onClick={onClick} className="flex flex-col items-center gap-2 transition-all active:scale-90">
               <div
                 className="w-[58px] h-[58px] rounded-2xl flex items-center justify-center"
                 style={{
                   background: bg,
-                  boxShadow: `0 4px 16px ${color}28, 0 1px 3px rgba(0,0,0,0.06)`,
-                  border: `1px solid ${color}18`,
+                  boxShadow: `0 4px 20px ${glow}, 0 1px 0 rgba(255,255,255,0.06) inset`,
+                  border: `1px solid ${color}28`,
                 }}
               >
-                <Icon size={23} style={{ color, strokeWidth: 2 }} />
+                <Icon size={22} style={{ color, strokeWidth: 2 }} />
               </div>
               <span className="text-xs font-semibold text-center leading-tight" style={{ color: 'var(--ink)', fontSize: 11 }}>{label}</span>
             </button>
@@ -244,16 +244,37 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
         </div>
       </div>
 
-      {/* Secondary actions */}
-      <div className="px-5 mb-6">
+      {/* Account setup completion banner */}
+      <div className="px-5 mb-4">
+        <div
+          className="rounded-2xl p-4 flex items-center gap-3"
+          style={{ background: 'linear-gradient(135deg, rgba(0,196,125,0.12), rgba(129,140,248,0.08))', border: '1px solid rgba(0,196,125,0.2)' }}
+        >
+          <div className="relative flex-shrink-0" style={{ width: 44, height: 44 }}>
+            <svg width="44" height="44" viewBox="0 0 44 44" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+              <circle cx="22" cy="22" r="18" fill="none" stroke="#00c47d" strokeWidth="3" strokeDasharray={`${2 * Math.PI * 18 * 0.4} ${2 * Math.PI * 18 * 0.6}`} strokeLinecap="round" />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-xs font-bold" style={{ color: '#00c47d' }}>40%</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Complete your account</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>Finish setup to unlock higher limits</p>
+          </div>
+          <ChevronRight size={16} style={{ color: 'var(--muted)', flexShrink: 0 }} />
+        </div>
+      </div>
+
+      {/* Secondary actions — Bills + Invite */}
+      <div className="px-5 mb-5">
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: 'Pay Bills', icon: Smartphone, onClick: onBills, color: '#F59E0B', bg: '#FEF3C7' },
-            { label: 'Invite', icon: UserPlus, onClick: onInvite, color: '#0EA5E9', bg: '#E0F2FE' },
-          ].map(({ label, icon: Icon, onClick, color, bg }) => (
-            <button key={label} onClick={onClick} className="flex items-center gap-2 px-3 py-3 rounded-2xl transition-all active:scale-95" style={{ background: bg, boxShadow: `0 2px 8px ${color}18` }}>
-              <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: color + '20' }}>
-                <Icon size={15} style={{ color }} />
+            { label: 'Pay Bills', icon: Smartphone, onClick: onBills, color: '#fbbf24', bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.2)' },
+            { label: 'Invite & Earn', icon: UserPlus, onClick: onInvite, color: '#818cf8', bg: 'rgba(129,140,248,0.12)', border: 'rgba(129,140,248,0.2)' },
+          ].map(({ label, icon: Icon, onClick, color, bg, border }) => (
+            <button key={label} onClick={onClick} className="flex items-center gap-2.5 px-3.5 py-3.5 rounded-2xl transition-all active:scale-95" style={{ background: bg, border: `1px solid ${border}` }}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${color}20` }}>
+                <Icon size={16} style={{ color }} />
               </div>
               <span className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>{label}</span>
             </button>
@@ -286,7 +307,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
 
       {/* SafePay Promo */}
       <div className="px-5 mb-6">
-        <div className="rounded-2xl p-4 flex items-center gap-3" style={{ ...glass.card, background: 'linear-gradient(135deg, rgba(0,168,107,0.08), rgba(91,108,246,0.06))' }}>
+        <div className="rounded-2xl p-4 flex items-center gap-3" style={{ background: 'linear-gradient(135deg, rgba(0,196,125,0.1), rgba(129,140,248,0.08))', border: '1px solid rgba(0,196,125,0.2)' }}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'var(--brand-light)' }}>
             <ShieldCheck size={20} style={{ color: 'var(--brand)' }} />
           </div>
@@ -309,7 +330,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
           <h3 className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Recent Activity</h3>
           <button className="text-xs font-medium" style={{ color: 'var(--brand)' }}>View all</button>
         </div>
-        <div className="rounded-2xl overflow-hidden" style={glass.card}>
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           {transactions.map((tx, i) => (
             <div key={tx.id}>
               <div className="flex items-center gap-3 px-4 py-3.5">

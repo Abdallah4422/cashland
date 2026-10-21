@@ -13,22 +13,22 @@ const cards = [
     icon: Smartphone,
     title: 'Send money with a phone number',
     description: 'No complicated wallet addresses. Just find someone and send.',
-    color: '#00A86B',
-    bg: '#E6F7F1',
+    color: '#00c47d',
+    bg: 'rgba(0,196,125,0.12)',
   },
   {
     icon: ShieldCheck,
     title: 'Powered onchain',
     description: 'Eligible payments are backed by verifiable blockchain settlement.',
-    color: '#5B6CF6',
-    bg: '#EEF0FE',
+    color: '#818cf8',
+    bg: 'rgba(129,140,248,0.12)',
   },
   {
     icon: Wallet,
     title: 'Your money. One simple wallet.',
     description: 'Pay, receive and manage digital money from one Cashland account.',
-    color: '#D97706',
-    bg: '#FEF3C7',
+    color: '#fbbf24',
+    bg: 'rgba(251,191,36,0.12)',
   },
 ];
 
@@ -44,11 +44,11 @@ export default function OnboardingScreen({ onGetStarted, onLogin }: Props) {
   const Icon = card.icon;
 
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ background: 'linear-gradient(180deg, #f9f9fc 0%, #fffcf7 52%, #fbf7f2 100%)' }}>
+    <div className="fixed inset-0 flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
       {/* Ambient */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div style={{ position: 'absolute', top: '5%', right: '5%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(18,45,69,0.07) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        <div style={{ position: 'absolute', bottom: '20%', left: '-5%', width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,168,107,0.07) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        <div style={{ position: 'absolute', top: '5%', right: '5%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,196,125,0.08) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        <div style={{ position: 'absolute', bottom: '20%', left: '-5%', width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,140,248,0.07) 0%, transparent 70%)', filter: 'blur(60px)' }} />
       </div>
 
       {/* Skip */}
