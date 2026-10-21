@@ -164,9 +164,9 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
               <p className="text-xs font-semibold text-white/70 mb-3 uppercase tracking-wide">Network Stats Today</p>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Payments', value: stats.paymentCount.toLocaleString(), icon: TrendingUp },
-                  { label: 'Active users', value: stats.activeUsers.toLocaleString(), icon: Users },
-                  { label: 'Volume', value: `₦${(stats.totalVolume / 1_000_000).toFixed(1)}M`, icon: TrendingUp },
+                  { label: 'Payments', value: stats.txCount.toLocaleString(), icon: TrendingUp },
+                  { label: 'Active users', value: stats.activeAddresses.toLocaleString(), icon: Users },
+                  { label: 'Volume', value: `₦${(stats.totalVolumeUsdc * 1600 / 1_000_000).toFixed(1)}M`, icon: TrendingUp },
                 ].map(s => {
                   const Icon = s.icon;
                   return (

@@ -1,46 +1,47 @@
-// useSocialFeed — anonymised live activity feed for social proof
-// Names are truncated (first name + last initial), amounts are real-looking but fictional,
-// phone numbers are never shown. Privacy-safe by design.
+// useSocialFeed — pseudonymous onchain activity feed
+// Actors are shown as CashTag handles or truncated wallet addresses.
+// No real names, no named merchants — just onchain-style activity.
 
 import { useState, useEffect, useRef } from 'react';
 import { formatNaira } from './design';
 
-export type FeedEventType = 'sent' | 'received' | 'merchant' | 'airtime' | 'deposit' | 'withdraw';
+export type FeedEventType = 'transfer' | 'payment' | 'topup' | 'swap' | 'escrow' | 'withdraw';
 
 export interface FeedEvent {
   id: string;
   type: FeedEventType;
-  actor: string;        // e.g. "Amaka B." — first name + last initial only
-  target?: string;      // merchant name or recipient first name + initial
+  actor: string;      // @cashtag or 0xABCD…EF12
+  target?: string;    // @cashtag or 0xABCD…EF12
   amount: number;
+  amountUsdc: number; // amount in USDC cents (amount / fxRate)
   time: Date;
   city: string;
+  txHash: string;     // simulated tx hash fragment
 }
 
-// Pools of realistic Nigerian data — anonymised
-const FIRST_NAMES = [
-  'Amaka', 'Emeka', 'Ngozi', 'Tunde', 'Kemi', 'Bola', 'Yetunde', 'Chidi',
-  'Fatima', 'Musa', 'Aisha', 'Seun', 'Tobi', 'Ola', 'Chiamaka', 'Ibrahim',
-  'Chisom', 'Adaeze', 'Femi', 'Hauwa', 'Sola', 'Nkechi', 'Dapo', 'Zainab',
-  'Uche', 'Lola', 'Gbenga', 'Adaobi', 'Kunle', 'Bisi', 'Rashida', 'Ifeanyi',
+// Pools
+const CASHTAG_PREFIXES = [
+  'cash', 'pay', 'send', 'ade', 'ola', 'chi', 'musa', 'bola', 'kemi',
+  'seun', 'tobi', 'ife', 'uche', 'lola', 'femi', 'zara', 'dayo', 'bayo',
 ];
-
-const LAST_INITIALS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
-
-const MERCHANTS = [
-  'Chicken Republic', 'Shoprite', 'TechHub', 'Domino\'s', 'Konga',
-  'MTN Airtime', 'Glo Airtime', 'IKEDC', 'DStv', 'Jumia', 'Uber',
-  'Chicken Republic', 'Tantalizers', 'EKEDC Bill', 'Airtel Data',
+const CASHTAG_SUFFIXES = [
+  '01', '22', '99', 'ng', 'pay', 'x', 'pro', '7', '55', 'io',
 ];
+const HEX_CHARS = '0123456789abcdef';
+const CITIES = ['Lagos', 'Abuja', 'PH', 'Kano', 'Ibadan', 'Enugu', 'Calabar'];
 
-const CITIES = ['Lagos', 'Abuja', 'Port Harcourt', 'Kano', 'Ibadan', 'Enugu', 'Calabar', 'Kaduna'];
-
-const AMOUNTS_SMALL = [500, 1000, 1500, 2000, 2500, 3000];
+const AMOUNTS_SMALL = [500, 1000, 1500, 2000, 2500, 3000, 3500];
 const AMOUNTS_MID   = [5000, 7500, 8000, 10000, 12000, 15000];
-const AMOUNTS_LARGE = [20000, 25000, 30000, 50000];
+const AMOUNTS_LARGE = [20000, 25000, 30000, 50000, 75000];
+
+const FX_APPROX = 1600; // approximate NGN/USDC for display only
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randomHex(len: number): string {
+  return Array.from({ length: len }, () => HEX_CHARS[Math.floor(Math.random() * 16)]).join('');
 }
 
 function randomAmount(): number {
@@ -50,35 +51,52 @@ function randomAmount(): number {
   return pick(AMOUNTS_LARGE);
 }
 
-function makeName(): string {
-  return `${pick(FIRST_NAMES)} ${pick(LAST_INITIALS)}.`;
+function makeActor(): string {
+  // 60% CashTag, 40% truncated wallet address
+  if (Math.random() < 0.6) {
+    return `@${pick(CASHTAG_PREFIXES)}${pick(CASHTAG_SUFFIXES)}`;
+  }
+  return `0x${randomHex(4)}…${randomHex(4)}`;
+}
+
+function makeTxHash(): string {
+  return `0x${randomHex(6)}…${randomHex(4)}`;
 }
 
 let _counter = 1;
 function makeEvent(): FeedEvent {
-  const types: FeedEventType[] = ['sent', 'merchant', 'airtime', 'deposit', 'sent', 'sent', 'merchant', 'merchant'];
+  const types: FeedEventType[] = [
+    'transfer', 'transfer', 'transfer',
+    'payment', 'payment',
+    'topup',
+    'swap',
+    'escrow',
+    'withdraw',
+  ];
   const type = pick(types);
+  const amount = randomAmount();
   return {
     id: String(_counter++),
     type,
-    actor: makeName(),
-    target: type === 'merchant' || type === 'airtime' ? pick(MERCHANTS) : type === 'sent' ? makeName() : undefined,
-    amount: randomAmount(),
+    actor: makeActor(),
+    target: (type === 'transfer' || type === 'payment' || type === 'escrow') ? makeActor() : undefined,
+    amount,
+    amountUsdc: Math.round((amount / FX_APPROX) * 100) / 100,
     time: new Date(),
     city: pick(CITIES),
+    txHash: makeTxHash(),
   };
 }
 
-// Pre-generate seed events so the feed isn't empty on first render
+// Pre-generate seed events
 const SEED_COUNT = 12;
 const seedEvents: FeedEvent[] = Array.from({ length: SEED_COUNT }, (_, i) => {
   const e = makeEvent();
-  // Stagger times backward
   e.time = new Date(Date.now() - (SEED_COUNT - i) * 18_000);
   return e;
 });
 
-// Shared singleton state so all hooks share the same feed
+// Shared singleton state
 let sharedFeed: FeedEvent[] = [...seedEvents];
 const feedListeners = new Set<() => void>();
 
@@ -87,7 +105,6 @@ function pushEvent(e: FeedEvent) {
   feedListeners.forEach(fn => fn());
 }
 
-// Live tick interval — starts once
 let tickInterval: ReturnType<typeof setInterval> | null = null;
 function startTick() {
   if (tickInterval) return;
@@ -96,28 +113,26 @@ function startTick() {
   }, 3500 + Math.random() * 2000);
 }
 
-// ── Today's stats (derived from feed) ───────────────────────────────────────
 export interface DayStats {
-  paymentCount: number;
-  totalVolume: number;
-  activeUsers: number;
+  txCount: number;
+  totalVolumeUsdc: number;
+  activeAddresses: number;
 }
 
 const BASE_STATS: DayStats = {
-  paymentCount: 3241,
-  totalVolume: 487_650_000,
-  activeUsers: 28_400,
+  txCount: 3241,
+  totalVolumeUsdc: 312_890,
+  activeAddresses: 28_400,
 };
 
 function computeStats(): DayStats {
   return {
-    paymentCount: BASE_STATS.paymentCount + sharedFeed.length,
-    totalVolume: BASE_STATS.totalVolume + sharedFeed.reduce((s, e) => s + e.amount, 0),
-    activeUsers: BASE_STATS.activeUsers + Math.floor(sharedFeed.length * 0.7),
+    txCount: BASE_STATS.txCount + sharedFeed.length,
+    totalVolumeUsdc: BASE_STATS.totalVolumeUsdc + sharedFeed.reduce((s, e) => s + e.amountUsdc, 0),
+    activeAddresses: BASE_STATS.activeAddresses + Math.floor(sharedFeed.length * 0.7),
   };
 }
 
-// ── Hook ────────────────────────────────────────────────────────────────────
 export interface SocialFeedData {
   events: FeedEvent[];
   stats: DayStats;
@@ -145,22 +160,23 @@ export function useSocialFeed(): SocialFeedData {
   };
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
 export function describeFeedEvent(e: FeedEvent): string {
+  const ngn = formatNaira(e.amount);
+  const usdc = `$${e.amountUsdc.toFixed(2)}`;
   switch (e.type) {
-    case 'sent':      return `${e.actor} sent ${formatNaira(e.amount)} to ${e.target ?? 'a friend'}`;
-    case 'received':  return `${e.actor} received ${formatNaira(e.amount)}`;
-    case 'merchant':  return `${e.actor} paid ${formatNaira(e.amount)} at ${e.target}`;
-    case 'airtime':   return `${e.actor} bought ${formatNaira(e.amount)} airtime`;
-    case 'deposit':   return `${e.actor} added ${formatNaira(e.amount)} to Cashland`;
-    case 'withdraw':  return `${e.actor} withdrew ${formatNaira(e.amount)} to bank`;
+    case 'transfer': return `${e.actor} transferred ${ngn} (${usdc}) → ${e.target}`;
+    case 'payment':  return `${e.actor} paid ${ngn} (${usdc}) → ${e.target}`;
+    case 'topup':    return `${e.actor} topped up ${ngn} (${usdc}) onchain`;
+    case 'swap':     return `${e.actor} swapped ${usdc} USDC on Arc`;
+    case 'escrow':   return `${e.actor} locked ${ngn} (${usdc}) in SafePay → ${e.target}`;
+    case 'withdraw': return `${e.actor} withdrew ${ngn} (${usdc}) to bank`;
   }
 }
 
 export function timeAgo(date: Date): string {
   const secs = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (secs < 10)  return 'just now';
-  if (secs < 60)  return `${secs}s ago`;
+  if (secs < 10)   return 'just now';
+  if (secs < 60)   return `${secs}s ago`;
   if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
   return `${Math.floor(secs / 3600)}h ago`;
 }
