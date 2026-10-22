@@ -5,19 +5,28 @@ import { pushSentNotification } from './useNotifications';
 import { ConnectKitButton } from 'connectkit';
 import { useAccount } from 'wagmi';
 import { isAddress } from 'viem';
-import { glass, navyGradient, brandGradient, formatNaira, contacts } from './design';
+import { navyGradient, brandGradient, formatNaira, contacts } from './design';
 import { Avatar } from './HomeScreen';
 import { useUsdcBalance, ngnToUsdc } from './useUsdcBalance';
 import { useUsdcTransfer } from './useUsdcTransfer';
 import { useFxRates, loadCurrencyPref, getFxBreakdown } from './useFxRates';
 
-interface Props {
-  onClose: () => void;
-}
-
+interface Props { onClose: () => void; }
 type Step = 'recipient' | 'amount' | 'review' | 'confirm' | 'receipt' | 'proof';
 
-const selectedContact = contacts[0]; // Aisha Bello
+const selectedContact = contacts[0];
+
+const darkGlass = {
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.10)',
+  borderRadius: '1rem',
+};
+
+const darkInner = {
+  background: 'rgba(255,255,255,0.03)',
+  border: '1px solid rgba(255,255,255,0.07)',
+  borderRadius: '1rem',
+};
 
 // ── Recipient Step ────────────────────────────────────────────
 function RecipientStep({ onNext, onBack: _onBack }: { onNext: (address: string) => void; onBack: () => void }) {
@@ -26,100 +35,87 @@ function RecipientStep({ onNext, onBack: _onBack }: { onNext: (address: string) 
   const [showAddressInput, setShowAddressInput] = useState(false);
   const [resolved, setResolved] = useState(false);
 
-  const handleInput = (v: string) => {
-    setQuery(v);
-    setResolved(v.length >= 5);
-  };
-
+  const handleInput = (v: string) => { setQuery(v); setResolved(v.length >= 5); };
   const canContinue = resolved || (showAddressInput && isAddress(customAddress));
-
   const handleContinue = () => {
-    if (showAddressInput && isAddress(customAddress)) {
-      onNext(customAddress);
-    } else {
-      onNext(selectedContact.walletAddress);
-    }
+    if (showAddressInput && isAddress(customAddress)) onNext(customAddress);
+    else onNext(selectedContact.walletAddress);
   };
 
   return (
     <div className="flex flex-col min-h-full">
       <div className="mb-5">
-        <h2 className="display text-xl font-bold" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Send Money</h2>
+        <h2 className="display text-xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>Send Money</h2>
+        <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>Phone, CashTag, or wallet address</p>
       </div>
 
-      {/* Search by CashTag / phone */}
-      <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl mb-4" style={glass.card}>
-        <Search size={18} style={{ color: 'var(--muted)' }} />
+      <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl mb-4" style={darkGlass}>
+        <Search size={18} style={{ color: 'rgba(255,255,255,0.35)' }} />
         <input
           autoFocus={!showAddressInput}
           type="text"
-          placeholder="Phone number or CashTag"
+          placeholder="Phone number or @CashTag"
           value={query}
           onChange={e => handleInput(e.target.value)}
-          className="flex-1 bg-transparent text-base outline-none"
-          style={{ color: 'var(--ink)' }}
+          className="flex-1 bg-transparent text-base outline-none text-white placeholder-white/30"
         />
       </div>
 
-      {/* Resolved contact */}
       <AnimatePresence>
         {resolved && !showAddressInput && (
           <motion.div
             className="rounded-2xl p-4 mb-4 flex items-center gap-3"
-            style={{ ...glass.card, border: '1.5px solid rgba(0,168,107,0.30)' }}
+            style={{ background: 'rgba(0,168,107,0.12)', border: '1.5px solid rgba(0,168,107,0.35)' }}
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           >
             <Avatar initials={selectedContact.initials} color={selectedContact.color} size={46} />
             <div className="flex-1">
               <div className="flex items-center gap-1.5">
-                <p className="text-base font-bold" style={{ color: 'var(--ink)' }}>{selectedContact.name} {selectedContact.surname}</p>
-                <CheckCircle2 size={15} style={{ color: 'var(--brand)' }} />
+                <p className="text-base font-bold text-white">{selectedContact.name} {selectedContact.surname}</p>
+                <CheckCircle2 size={15} style={{ color: '#00A86B' }} />
               </div>
-              <p className="text-sm" style={{ color: 'var(--brand)' }}>{selectedContact.tag}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{selectedContact.phone}</p>
+              <p className="text-sm font-semibold" style={{ color: '#00A86B' }}>{selectedContact.tag}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{selectedContact.phone}</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Recent recipients */}
       {!resolved && !showAddressInput && (
         <div className="mb-4">
-          <p className="text-xs font-semibold mb-3 uppercase" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>Recent</p>
+          <p className="text-xs font-semibold mb-3 uppercase" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}>Recent</p>
           <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
             {contacts.map(c => (
               <button key={c.id} className="flex flex-col items-center gap-1.5 flex-shrink-0 transition-all active:scale-95" onClick={() => { setQuery(c.tag); setResolved(true); }}>
                 <Avatar initials={c.initials} color={c.color} size={48} />
-                <span className="text-xs font-medium" style={{ color: 'var(--ink)' }}>{c.name}</span>
-                <span className="text-xs" style={{ color: 'var(--muted)' }}>{c.tag}</span>
+                <span className="text-xs font-medium text-white">{c.name}</span>
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>{c.tag}</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Advanced: send to wallet address */}
       <button
         onClick={() => { setShowAddressInput(v => !v); setResolved(false); setQuery(''); }}
         className="text-xs font-medium mb-4 text-left"
-        style={{ color: 'var(--subtle)' }}
+        style={{ color: 'rgba(255,255,255,0.40)' }}
       >
         {showAddressInput ? 'Use CashTag / phone instead' : 'Send to wallet address'}
       </button>
 
       {showAddressInput && (
-        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl mb-4" style={glass.card}>
-          <Wallet size={16} style={{ color: 'var(--muted)' }} />
+        <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl mb-4" style={darkGlass}>
+          <Wallet size={16} style={{ color: 'rgba(255,255,255,0.35)' }} />
           <input
             autoFocus
             type="text"
             placeholder="0x..."
             value={customAddress}
             onChange={e => setCustomAddress(e.target.value)}
-            className="flex-1 bg-transparent text-sm font-mono outline-none"
-            style={{ color: 'var(--ink)' }}
+            className="flex-1 bg-transparent text-sm font-mono outline-none text-white placeholder-white/30"
           />
-          {isAddress(customAddress) && <CheckCircle2 size={15} style={{ color: 'var(--brand)' }} />}
+          {isAddress(customAddress) && <CheckCircle2 size={15} style={{ color: '#00A86B' }} />}
         </div>
       )}
 
@@ -127,7 +123,7 @@ function RecipientStep({ onNext, onBack: _onBack }: { onNext: (address: string) 
         <button
           disabled={!canContinue}
           onClick={handleContinue}
-          className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-40"
+          className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
           style={{ background: brandGradient, boxShadow: canContinue ? '0 8px 24px rgba(0,168,107,0.35)' : 'none' }}
         >
           Continue
@@ -145,55 +141,52 @@ function AmountStep({ onNext, onBack: _onBack }: { onNext: (amount: number, note
   const { rates } = useFxRates();
   const activeCurrency = loadCurrencyPref();
   const chips = [1000, 5000, 10000, 20000];
-
   const numAmount = parseFloat(amount) || 0;
   const valid = numAmount > 0 && numAmount <= ngnFloat;
 
   return (
     <div className="flex flex-col min-h-full">
-      <div className="flex items-center gap-3 mb-6 px-4 py-3 rounded-2xl" style={{ background: 'var(--brand-light)' }}>
+      <div className="flex items-center gap-3 mb-6 px-4 py-3 rounded-2xl" style={{ background: 'rgba(0,168,107,0.12)', border: '1px solid rgba(0,168,107,0.20)' }}>
         <Avatar initials={selectedContact.initials} color={selectedContact.color} size={36} />
         <div>
-          <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{selectedContact.name} {selectedContact.surname}</p>
-          <p className="text-xs" style={{ color: 'var(--brand)' }}>{selectedContact.tag}</p>
+          <p className="text-sm font-semibold text-white">{selectedContact.name} {selectedContact.surname}</p>
+          <p className="text-xs font-semibold" style={{ color: '#00A86B' }}>{selectedContact.tag}</p>
         </div>
       </div>
 
-      <p className="text-sm font-semibold mb-3" style={{ color: 'var(--subtle)' }}>How much are you sending?</p>
+      <p className="text-sm font-semibold mb-3" style={{ color: 'rgba(255,255,255,0.50)' }}>How much are you sending?</p>
 
-      <div className="rounded-2xl p-5 mb-4" style={glass.card}>
+      <div className="rounded-2xl p-5 mb-4" style={darkGlass}>
         <div className="flex items-baseline gap-2 mb-3">
-          <span className="display text-3xl font-bold" style={{ color: 'var(--muted)' }}>₦</span>
+          <span className="display text-3xl font-bold" style={{ color: 'rgba(255,255,255,0.30)' }}>₦</span>
           <input
             type="number"
             inputMode="decimal"
             placeholder="0"
             value={amount}
             onChange={e => setAmount(e.target.value)}
-            className="display flex-1 text-4xl font-bold bg-transparent outline-none tabular"
-            style={{ color: 'var(--ink)', letterSpacing: '-0.03em' }}
+            className="display flex-1 text-4xl font-bold bg-transparent outline-none tabular text-white placeholder-white/20"
+            style={{ letterSpacing: '-0.03em' }}
           />
         </div>
         {numAmount > 0 && (
           <div className="mb-2">
-            <p className="text-xs font-medium" style={{ color: 'var(--brand)' }}>
+            <p className="text-xs font-semibold" style={{ color: '#00A86B' }}>
               = {ngnToUsdc(numAmount).toFixed(4)} USDC
             </p>
             {activeCurrency !== 'NGN' && (
-              <p className="text-xs mt-0.5" style={{ color: 'var(--subtle)' }}>
-                {getFxBreakdown(numAmount, rates)}
-              </p>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.40)' }}>{getFxBreakdown(numAmount, rates)}</p>
             )}
             {activeCurrency === 'NGN' && (
-              <p className="text-xs mt-0.5" style={{ color: 'var(--subtle)' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.40)' }}>
                 ≈ ${(ngnToUsdc(numAmount) * rates.USD).toFixed(2)} · £{(ngnToUsdc(numAmount) * rates.GBP).toFixed(2)}
               </p>
             )}
           </div>
         )}
-        <p className="text-xs" style={{ color: 'var(--muted)' }}>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
           Available:{' '}
-          <span className="font-semibold" style={{ color: isConnected ? 'var(--brand)' : 'var(--muted)' }}>
+          <span className="font-semibold" style={{ color: isConnected ? '#00A86B' : 'rgba(255,255,255,0.35)' }}>
             {isConnected ? formattedNgn : 'Connect wallet'}
           </span>
         </p>
@@ -206,9 +199,9 @@ function AmountStep({ onNext, onBack: _onBack }: { onNext: (amount: number, note
             onClick={() => setAmount(String(v))}
             className="px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0 transition-all active:scale-95"
             style={{
-              background: amount === String(v) ? 'var(--brand)' : 'rgba(255,255,255,0.75)',
-              color: amount === String(v) ? 'white' : 'var(--ink)',
-              border: `1.5px solid ${amount === String(v) ? 'var(--brand)' : 'rgba(0,0,0,0.08)'}`,
+              background: amount === String(v) ? '#00A86B' : 'rgba(255,255,255,0.08)',
+              color: amount === String(v) ? 'white' : 'rgba(255,255,255,0.70)',
+              border: `1.5px solid ${amount === String(v) ? '#00A86B' : 'rgba(255,255,255,0.10)'}`,
             }}
           >
             {formatNaira(v)}
@@ -216,14 +209,13 @@ function AmountStep({ onNext, onBack: _onBack }: { onNext: (amount: number, note
         ))}
       </div>
 
-      <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl mb-4" style={glass.inner}>
+      <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl mb-4" style={darkInner}>
         <input
           type="text"
           placeholder="What's this for? (optional)"
           value={note}
           onChange={e => setNote(e.target.value)}
-          className="flex-1 bg-transparent text-sm outline-none"
-          style={{ color: 'var(--ink)' }}
+          className="flex-1 bg-transparent text-sm outline-none text-white placeholder-white/30"
         />
       </div>
 
@@ -231,34 +223,23 @@ function AmountStep({ onNext, onBack: _onBack }: { onNext: (amount: number, note
         <button
           disabled={!valid}
           onClick={() => onNext(numAmount, note)}
-          className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-40"
+          className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
           style={{ background: brandGradient, boxShadow: valid ? '0 8px 24px rgba(0,168,107,0.35)' : 'none' }}
         >
           Continue
         </button>
         {numAmount > ngnFloat && ngnFloat > 0 && (
-          <p className="text-center text-xs mt-2" style={{ color: 'var(--error)' }}>
-            Amount exceeds your balance
-          </p>
+          <p className="text-center text-xs mt-2" style={{ color: '#f87171' }}>Amount exceeds your balance</p>
         )}
       </div>
     </div>
   );
 }
 
-// ── Review + onchain confirm step ────────────────────────────
-function ConfirmStep({
-  amount,
-  note: _note,
-  recipientAddress,
-  onDone,
-  onBack: _onBack,
-}: {
-  amount: number;
-  note: string;
-  recipientAddress: string;
-  onDone: (hash: string) => void;
-  onBack: () => void;
+// ── Review + onchain confirm step ─────────────────────────────
+function ConfirmStep({ amount, note: _note, recipientAddress, onDone, onBack: _onBack }: {
+  amount: number; note: string; recipientAddress: string;
+  onDone: (hash: string) => void; onBack: () => void;
 }) {
   const { isConnected } = useAccount();
   const { send, status, hash, explorerUrl, parsedError, isCancelled, reset } = useUsdcTransfer();
@@ -267,11 +248,7 @@ function ConfirmStep({
   const usdEquiv = `$${(ngnToUsdc(amount) * rates.USD).toFixed(2)}`;
   const gbpEquiv = `£${(ngnToUsdc(amount) * rates.GBP).toFixed(2)}`;
 
-  // Advance to success once confirmed
-  if (status === 'success' && hash) {
-    // Trigger only once by calling after render using a flag
-    setTimeout(() => onDone(hash), 200);
-  }
+  if (status === 'success' && hash) setTimeout(() => onDone(hash), 200);
 
   const rows = [
     { label: 'Recipient', value: selectedContact.name + ' ' + selectedContact.surname },
@@ -293,62 +270,42 @@ function ConfirmStep({
   const ctaLabel = () => {
     if (!isConnected) return 'Connect wallet to send';
     if (status === 'wrong-chain') return 'Switch to Arc Testnet';
-    if (status === 'signing') return (
-      <span className="flex items-center justify-center gap-2">
-        <Loader2 size={16} className="animate-spin" />Confirm in wallet...
-      </span>
-    );
-    if (status === 'confirming') return (
-      <span className="flex items-center justify-center gap-2">
-        <Loader2 size={16} className="animate-spin" />Confirming on chain...
-      </span>
-    );
-    if (status === 'success') return (
-      <span className="flex items-center justify-center gap-2">
-        <CheckCircle2 size={16} />Payment confirmed
-      </span>
-    );
+    if (status === 'signing') return <span className="flex items-center justify-center gap-2"><Loader2 size={16} className="animate-spin" />Confirm in wallet...</span>;
+    if (status === 'confirming') return <span className="flex items-center justify-center gap-2"><Loader2 size={16} className="animate-spin" />Confirming on chain...</span>;
+    if (status === 'success') return <span className="flex items-center justify-center gap-2"><CheckCircle2 size={16} />Payment confirmed</span>;
     if (isCancelled) return 'Try again';
     return `Send ${formatNaira(amount)}`;
   };
 
   return (
     <div className="flex flex-col min-h-full">
-      <h2 className="display text-xl font-bold mb-5" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Review transfer</h2>
+      <h2 className="display text-xl font-bold text-white mb-5" style={{ letterSpacing: '-0.02em' }}>Review transfer</h2>
 
-      <div className="rounded-2xl overflow-hidden mb-4" style={glass.card}>
+      <div className="rounded-2xl overflow-hidden mb-4" style={darkGlass}>
         {rows.map((row, i) => (
           <div key={row.label}>
             <div className="flex items-center justify-between px-4 py-3.5">
-              <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
-              <span
-                className="text-sm font-semibold tabular"
-                style={{ color: row.brand ? 'var(--brand)' : row.bold ? 'var(--ink)' : row.accent ? 'var(--brand)' : 'var(--muted)' }}
-              >
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{row.label}</span>
+              <span className="text-sm font-semibold tabular" style={{ color: row.brand ? '#00A86B' : row.bold ? 'white' : row.accent ? '#00A86B' : 'rgba(255,255,255,0.55)' }}>
                 {row.value}
               </span>
             </div>
-            {i < rows.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+            {i < rows.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />}
           </div>
         ))}
       </div>
 
-      <div className="flex items-start gap-2 px-4 py-3 rounded-xl mb-4" style={{ background: 'var(--brand-light)' }}>
-        <Info size={14} style={{ color: 'var(--brand)', flexShrink: 0, marginTop: 1 }} />
-        <p className="text-xs" style={{ color: 'var(--subtle)' }}>
-          Cashland settles this payment using USDC on Arc Testnet. Your wallet will request a signature.
+      <div className="flex items-start gap-2 px-4 py-3 rounded-xl mb-4" style={{ background: 'rgba(0,168,107,0.10)', border: '1px solid rgba(0,168,107,0.20)' }}>
+        <Info size={14} style={{ color: '#00A86B', flexShrink: 0, marginTop: 1 }} />
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.55)' }}>
+          Cashland settles this payment using USDC on Arc Mainnet. Your wallet will request a signature.
         </p>
       </div>
 
-      {/* Error state */}
       {parsedError && !isCancelled && (
-        <motion.div
-          className="flex items-start gap-2 px-4 py-3 rounded-xl mb-4"
-          style={{ background: 'rgba(229,62,62,0.08)' }}
-          initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-        >
-          <AlertCircle size={14} style={{ color: 'var(--error)', flexShrink: 0, marginTop: 1 }} />
-          <p className="text-xs" style={{ color: 'var(--error)' }}>{parsedError}</p>
+        <motion.div className="flex items-start gap-2 px-4 py-3 rounded-xl mb-4" style={{ background: 'rgba(248,113,113,0.10)' }} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}>
+          <AlertCircle size={14} style={{ color: '#f87171', flexShrink: 0, marginTop: 1 }} />
+          <p className="text-xs" style={{ color: '#f87171' }}>{parsedError}</p>
         </motion.div>
       )}
 
@@ -356,34 +313,18 @@ function ConfirmStep({
         {!isConnected ? (
           <ConnectKitButton.Custom>
             {({ show }) => (
-              <button
-                onClick={show}
-                className="w-full py-4 rounded-2xl text-base font-semibold text-white flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-                style={{ background: brandGradient, boxShadow: '0 8px 24px rgba(0,168,107,0.35)' }}
-              >
+              <button onClick={show} className="w-full py-4 rounded-2xl text-base font-semibold text-white flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: brandGradient, boxShadow: '0 8px 24px rgba(0,168,107,0.35)' }}>
                 <Wallet size={18} /> Connect wallet to send
               </button>
             )}
           </ConnectKitButton.Custom>
         ) : (
-          <button
-            onClick={handleSend}
-            disabled={status === 'signing' || status === 'confirming' || status === 'success'}
-            className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-60"
-            style={{ background: brandGradient, boxShadow: '0 8px 24px rgba(0,168,107,0.35)' }}
-          >
+          <button onClick={handleSend} disabled={status === 'signing' || status === 'confirming' || status === 'success'} className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-60" style={{ background: brandGradient, boxShadow: '0 8px 24px rgba(0,168,107,0.35)' }}>
             {ctaLabel()}
           </button>
         )}
-
         {explorerUrl && (
-          <a
-            href={explorerUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="w-full py-2.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-            style={{ background: 'rgba(0,168,107,0.10)', color: 'var(--brand)' }}
-          >
+          <a href={explorerUrl} target="_blank" rel="noreferrer" className="w-full py-2.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(0,168,107,0.10)', color: '#00A86B' }}>
             <ExternalLink size={14} /> View on explorer
           </a>
         )}
@@ -394,28 +335,24 @@ function ConfirmStep({
 
 // ── Success Step ──────────────────────────────────────────────
 function SuccessStep({ amount, txHash, explorerUrl, onReceipt, onSendAgain, onDone }: {
-  amount: number;
-  txHash: string;
-  explorerUrl: string | null;
-  onReceipt: () => void;
-  onSendAgain: () => void;
-  onDone: () => void;
+  amount: number; txHash: string; explorerUrl: string | null;
+  onReceipt: () => void; onSendAgain: () => void; onDone: () => void;
 }) {
   return (
     <div className="flex flex-col items-center min-h-full">
       <motion.div className="mt-6 mb-6" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 18, delay: 0.1 }}>
-        <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ background: 'var(--brand-light)', boxShadow: '0 12px 40px rgba(0,168,107,0.25)' }}>
-          <CheckCircle2 size={52} style={{ color: 'var(--brand)' }} strokeWidth={1.8} />
+        <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,168,107,0.15)', boxShadow: '0 0 60px rgba(0,168,107,0.4)' }}>
+          <CheckCircle2 size={52} style={{ color: '#00A86B' }} strokeWidth={1.8} />
         </div>
       </motion.div>
 
       <motion.div className="text-center mb-6" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-        <h2 className="display text-2xl font-bold mb-1" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Payment Successful</h2>
-        <div className="display text-4xl font-bold tabular mb-1" style={{ color: 'var(--brand)', letterSpacing: '-0.03em' }}>{formatNaira(amount)}</div>
-        <p className="text-sm" style={{ color: 'var(--subtle)' }}>sent to {selectedContact.name} {selectedContact.surname}</p>
+        <h2 className="display text-2xl font-bold text-white mb-1" style={{ letterSpacing: '-0.02em' }}>Payment Successful</h2>
+        <div className="display text-4xl font-bold tabular mb-1" style={{ color: '#00A86B', letterSpacing: '-0.03em' }}>{formatNaira(amount)}</div>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>sent to {selectedContact.name} {selectedContact.surname}</p>
       </motion.div>
 
-      <motion.div className="w-full rounded-2xl overflow-hidden mb-6" style={glass.card} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+      <motion.div className="w-full rounded-2xl overflow-hidden mb-6" style={darkGlass} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
         {[
           { label: 'CashTag', value: selectedContact.tag, accent: true },
           { label: 'Reference', value: 'CL-' + txHash.slice(2, 10).toUpperCase(), mono: true },
@@ -424,30 +361,30 @@ function SuccessStep({ amount, txHash, explorerUrl, onReceipt, onSendAgain, onDo
         ].map((row, i, arr) => (
           <div key={row.label}>
             <div className="flex items-center justify-between px-4 py-3.5">
-              <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{row.label}</span>
               <div className="flex items-center gap-1.5">
-                {row.success && <CheckCircle2 size={13} style={{ color: 'var(--brand)' }} />}
-                <span className={`text-sm font-semibold ${row.mono ? 'mono' : ''} tabular`} style={{ color: row.accent || row.success ? 'var(--brand)' : 'var(--ink)' }}>
+                {row.success && <CheckCircle2 size={13} style={{ color: '#00A86B' }} />}
+                <span className={`text-sm font-semibold ${row.mono ? 'font-mono text-xs' : ''} tabular`} style={{ color: row.accent || row.success ? '#00A86B' : 'white' }}>
                   {row.value}
                 </span>
               </div>
             </div>
-            {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+            {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />}
           </div>
         ))}
       </motion.div>
 
       <motion.div className="w-full space-y-3" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
         <div className="flex gap-3">
-          <button onClick={onReceipt} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}>
+          <button onClick={onReceipt} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(0,168,107,0.15)', color: '#00A86B' }}>
             <Receipt size={16} /> View Receipt
           </button>
-          <button onClick={onSendAgain} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--ink)' }}>
+          <button onClick={onSendAgain} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(255,255,255,0.08)', color: 'white' }}>
             <RefreshCcw size={16} /> Send Again
           </button>
         </div>
         {explorerUrl && (
-          <a href={explorerUrl} target="_blank" rel="noreferrer" className="w-full py-2.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(0,168,107,0.10)', color: 'var(--brand)' }}>
+          <a href={explorerUrl} target="_blank" rel="noreferrer" className="w-full py-2.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(0,168,107,0.10)', color: '#00A86B' }}>
             <ExternalLink size={14} /> View transaction on explorer
           </a>
         )}
@@ -461,18 +398,13 @@ function SuccessStep({ amount, txHash, explorerUrl, onReceipt, onSendAgain, onDo
 
 // ── Receipt Step ──────────────────────────────────────────────
 function ReceiptStep({ amount, txHash, explorerUrl, confirmedAt, onProof, onClose }: {
-  amount: number;
-  txHash: string;
-  explorerUrl: string | null;
-  confirmedAt: Date;
-  onProof: () => void;
-  onClose: () => void;
+  amount: number; txHash: string; explorerUrl: string | null;
+  confirmedAt: Date; onProof: () => void; onClose: () => void;
 }) {
   const shortHash = txHash.slice(0, 6) + '...' + txHash.slice(-4);
-  const now = confirmedAt;
   return (
     <div className="flex flex-col min-h-full">
-      <div className="rounded-3xl overflow-hidden mb-4" style={{ ...glass.receipt, background: 'white' }}>
+      <div className="rounded-3xl overflow-hidden mb-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
         <div className="px-5 py-5 text-center" style={{ background: navyGradient }}>
           <div className="flex items-center justify-center gap-2 mb-1">
             <svg width="20" height="20" viewBox="0 0 44 44" fill="none">
@@ -492,8 +424,8 @@ function ReceiptStep({ amount, txHash, explorerUrl, confirmedAt, onProof, onClos
           {[
             { label: 'Sent to', value: selectedContact.name + ' ' + selectedContact.surname },
             { label: 'CashTag', value: selectedContact.tag, accent: true },
-            { label: 'Date', value: now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) },
-            { label: 'Time', value: now.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) },
+            { label: 'Date', value: confirmedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) },
+            { label: 'Time', value: confirmedAt.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) },
             { label: 'Reference', value: 'CL-' + txHash.slice(2, 10).toUpperCase(), mono: true },
             { label: 'Network fee', value: '₦0' },
             { label: 'Blockchain', value: 'Verified', success: true },
@@ -501,15 +433,15 @@ function ReceiptStep({ amount, txHash, explorerUrl, confirmedAt, onProof, onClos
           ].map((row, i, arr) => (
             <div key={row.label}>
               <div className="flex items-center justify-between py-3">
-                <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{row.label}</span>
                 <div className="flex items-center gap-1">
-                  {row.success && <CheckCircle2 size={12} style={{ color: 'var(--brand)' }} />}
-                  <span className={`text-sm font-semibold ${row.mono ? 'mono text-xs' : ''}`} style={{ color: row.accent || row.success ? 'var(--brand)' : row.muted ? 'var(--muted)' : 'var(--ink)' }}>
+                  {row.success && <CheckCircle2 size={12} style={{ color: '#00A86B' }} />}
+                  <span className={`text-sm font-semibold ${row.mono ? 'font-mono text-xs' : ''}`} style={{ color: row.accent || row.success ? '#00A86B' : row.muted ? 'rgba(255,255,255,0.40)' : 'white' }}>
                     {row.value}
                   </span>
                 </div>
               </div>
-              {i < arr.length - 1 && <div className="h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+              {i < arr.length - 1 && <div className="h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />}
             </div>
           ))}
         </div>
@@ -517,15 +449,15 @@ function ReceiptStep({ amount, txHash, explorerUrl, confirmedAt, onProof, onClos
 
       <div className="space-y-3">
         <div className="flex gap-3">
-          <button onClick={onProof} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2" style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}>
-            <ExternalLink size={15} /> View Onchain Proof
+          <button onClick={onProof} className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2" style={{ background: 'rgba(0,168,107,0.15)', color: '#00A86B' }}>
+            <ExternalLink size={15} /> Onchain Proof
           </button>
-          <button className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2" style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--ink)' }}>
+          <button className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2" style={{ background: 'rgba(255,255,255,0.08)', color: 'white' }}>
             <Share2 size={15} /> Share
           </button>
         </div>
         {explorerUrl && (
-          <a href={explorerUrl} target="_blank" rel="noreferrer" className="w-full py-2.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2" style={{ background: 'rgba(0,168,107,0.10)', color: 'var(--brand)' }}>
+          <a href={explorerUrl} target="_blank" rel="noreferrer" className="w-full py-2.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2" style={{ background: 'rgba(0,168,107,0.10)', color: '#00A86B' }}>
             <ExternalLink size={14} /> Open in explorer
           </a>
         )}
@@ -550,7 +482,7 @@ function ProofStep({ txHash, explorerUrl, onClose }: { txHash: string; explorerU
 
   const shortFrom = address ? address.slice(0, 6) + '...' + address.slice(-4) : '0x71F...92A';
   const shortTo = selectedContact.walletAddress.slice(0, 6) + '...' + selectedContact.walletAddress.slice(-4);
-  const usdcAmount = ngnToUsdc(5000).toFixed(4); // shown for proof context
+  const usdcAmount = ngnToUsdc(5000).toFixed(4);
 
   const rows = [
     { label: 'Transaction hash', value: txHash.slice(0, 10) + '...' + txHash.slice(-6), mono: true },
@@ -558,43 +490,43 @@ function ProofStep({ txHash, explorerUrl, onClose }: { txHash: string; explorerU
     { label: 'To', value: shortTo, mono: true },
     { label: 'Asset', value: 'USDC' },
     { label: 'Amount', value: `${usdcAmount} USDC` },
-    { label: 'Network', value: 'Arc Testnet' },
+    { label: 'Network', value: 'Arc Mainnet' },
     { label: 'Block status', value: 'Confirmed', success: true },
   ];
 
   return (
     <div className="flex flex-col min-h-full">
-      <h2 className="display text-xl font-bold mb-2" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Transaction Proof</h2>
+      <h2 className="display text-xl font-bold text-white mb-2" style={{ letterSpacing: '-0.02em' }}>Transaction Proof</h2>
       <div className="flex items-center gap-1.5 mb-5">
-        <CheckCircle2 size={14} style={{ color: 'var(--brand)' }} />
-        <span className="text-sm font-semibold" style={{ color: 'var(--brand)' }}>Confirmed onchain</span>
+        <CheckCircle2 size={14} style={{ color: '#00A86B' }} />
+        <span className="text-sm font-semibold" style={{ color: '#00A86B' }}>Confirmed onchain</span>
       </div>
 
-      <div className="rounded-2xl px-4 py-3 mb-4" style={{ background: 'var(--brand-light)' }}>
-        <p className="text-sm text-pretty leading-relaxed" style={{ color: 'var(--subtle)' }}>
+      <div className="rounded-2xl px-4 py-3 mb-4" style={{ background: 'rgba(0,168,107,0.10)', border: '1px solid rgba(0,168,107,0.20)' }}>
+        <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
           This transaction has been recorded on a public blockchain and can be independently verified. Your personal Cashland information is not published with it.
         </p>
       </div>
 
-      <div className="rounded-2xl overflow-hidden mb-4" style={glass.card}>
+      <div className="rounded-2xl overflow-hidden mb-4" style={darkGlass}>
         {rows.map((row, i, arr) => (
           <div key={row.label}>
             <div className="flex items-center justify-between px-4 py-3.5">
-              <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{row.label}</span>
               <div className="flex items-center gap-1.5">
-                {row.success && <CheckCircle2 size={12} style={{ color: 'var(--brand)' }} />}
-                <span className={`text-sm font-semibold ${row.mono ? 'mono text-xs' : ''}`} style={{ color: row.success ? 'var(--brand)' : 'var(--ink)' }}>
+                {row.success && <CheckCircle2 size={12} style={{ color: '#00A86B' }} />}
+                <span className={`text-sm font-semibold ${row.mono ? 'font-mono text-xs' : ''}`} style={{ color: row.success ? '#00A86B' : 'white' }}>
                   {row.value}
                 </span>
               </div>
             </div>
-            {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+            {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />}
           </div>
         ))}
       </div>
 
       <div className="mt-auto space-y-3">
-        <button onClick={handleCopy} className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}>
+        <button onClick={handleCopy} className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(0,168,107,0.15)', color: '#00A86B' }}>
           {copied ? <Check size={16} /> : <Copy size={16} />}
           {copied ? 'Hash copied' : 'Copy transaction hash'}
         </button>
@@ -621,7 +553,6 @@ export default function SendMoneyFlow({ onClose }: Props) {
   const [txHash, setTxHash] = useState('');
   const [explorerUrl, setExplorerUrl] = useState<string | null>(null);
   const [confirmedAt] = useState<Date>(() => new Date());
-
   const { hash: liveHash, explorerUrl: liveExplorerUrl } = useUsdcTransfer();
 
   const handleAmountNext = (a: number, n: string) => { setAmount(a); setNote(n); setStep('review'); };
@@ -632,7 +563,7 @@ export default function SendMoneyFlow({ onClose }: Props) {
       selectedContact.name + ' ' + selectedContact.surname,
       new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(amount),
     );
-    setStep('receipt'); // skip to receipt; success is shown on confirm step
+    setStep('receipt');
   };
 
   const titles: Record<Step, string> = {
@@ -641,9 +572,11 @@ export default function SendMoneyFlow({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
+      {/* Ambient glows */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div style={{ position: 'absolute', top: '5%', right: '0%', width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,168,107,0.10) 0%, transparent 70%)', filter: 'blur(50px)' }} />
+        <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,168,107,0.12) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)', filter: 'blur(60px)' }} />
       </div>
 
       {!['confirm'].includes(step) && (
@@ -656,11 +589,11 @@ export default function SendMoneyFlow({ onClose }: Props) {
               else onClose();
             }}
             className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.70)', border: '1px solid rgba(0,0,0,0.08)' }}
+            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
           >
-            <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+            <ChevronLeft size={20} className="text-white" />
           </button>
-          <h1 className="display text-lg font-bold" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>
+          <h1 className="display text-lg font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
             {titles[step]}
           </h1>
         </div>
@@ -678,15 +611,7 @@ export default function SendMoneyFlow({ onClose }: Props) {
           >
             {step === 'recipient' && <RecipientStep onNext={addr => { setRecipientAddress(addr); setStep('amount'); }} onBack={onClose} />}
             {step === 'amount' && <AmountStep onNext={handleAmountNext} onBack={() => setStep('recipient')} />}
-            {step === 'review' && (
-              <ConfirmStep
-                amount={amount}
-                note={note}
-                recipientAddress={recipientAddress}
-                onDone={handleConfirmDone}
-                onBack={() => setStep('amount')}
-              />
-            )}
+            {step === 'review' && <ConfirmStep amount={amount} note={note} recipientAddress={recipientAddress} onDone={handleConfirmDone} onBack={() => setStep('amount')} />}
             {step === 'confirm' && (
               <SuccessStep
                 amount={amount}
