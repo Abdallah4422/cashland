@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, ArrowUpRight, ArrowDownLeft, Users, TrendingUp, ChevronRight } from 'lucide-react';
-import { glass, formatNaira } from './design';
+import { CheckCircle2, ArrowUpRight, ArrowDownLeft, Users, TrendingUp, ChevronRight, Zap } from 'lucide-react';
+import { formatNaira } from './design';
 import { Avatar } from './HomeScreen';
 import { useSocialFeed, describeFeedEvent, timeAgo } from './useSocialFeed';
 import DisputeScreen, { type DisputeTransaction } from './DisputeScreen';
@@ -20,12 +20,33 @@ type TabId = 'mine' | 'network';
 
 import type { ApiTransaction } from './api';
 
+const darkCard = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20 };
+const darkInner = { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 16 };
+
+const eventTypeColor = (type: string) => {
+  if (type === 'sent') return '#F97316';
+  if (type === 'received') return '#00C47D';
+  if (type === 'airtime') return '#8B5CF6';
+  if (type === 'merchant') return '#0EA5E9';
+  return '#6B7280';
+};
+
+const eventTypeBadge = (type: string) => {
+  const colors: Record<string, { bg: string; text: string }> = {
+    sent: { bg: 'rgba(249,115,22,0.15)', text: '#F97316' },
+    received: { bg: 'rgba(0,196,125,0.15)', text: '#00C47D' },
+    airtime: { bg: 'rgba(139,92,246,0.15)', text: '#8B5CF6' },
+    merchant: { bg: 'rgba(14,165,233,0.15)', text: '#0EA5E9' },
+    safepay: { bg: 'rgba(234,179,8,0.15)', text: '#EAB308' },
+  };
+  return colors[type] ?? { bg: 'rgba(107,114,128,0.15)', text: '#6B7280' };
+};
+
 export default function ActivityScreen({ liveTransactions: _liveTransactions }: { liveTransactions?: ApiTransaction[] }) {
   const [activeTab, setActiveTab] = useState<TabId>('mine');
   const [filter, setFilter] = useState<Filter>('All');
   const [selectedTx, setSelectedTx] = useState<DisputeTransaction | null>(null);
   const { events, stats } = useSocialFeed();
-  const isLive = true;
   const [showAll, setShowAll] = useState(false);
 
   const filtered = allTransactions.filter(tx => {
@@ -37,52 +58,40 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
 
   const displayEvents = showAll ? events : events.slice(0, 12);
 
-  const eventColor = (type: string) => {
-    if (type === 'sent') return '#F97316';
-    if (type === 'received') return '#00A86B';
-    if (type === 'airtime') return '#8B5CF6';
-    if (type === 'merchant') return '#0EA5E9';
-    return '#6B7280';
-  };
-
   if (selectedTx) {
-    return (
-      <DisputeScreen
-        transaction={selectedTx}
-        onClose={() => setSelectedTx(null)}
-      />
-    );
+    return <DisputeScreen transaction={selectedTx} onClose={() => setSelectedTx(null)} />;
   }
 
   return (
-    <div className="pb-24 pt-6">
+    <div className="pb-24 pt-6" style={{ minHeight: '100vh' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-5 mb-4">
-        <h2 className="display text-xl font-bold" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Activity</h2>
-        {isLive && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: 'rgba(0,168,107,0.08)' }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--brand)' }} />
-            <span className="text-xs font-semibold" style={{ color: 'var(--brand)' }}>Live</span>
-          </div>
-        )}
+      <div className="flex items-center justify-between px-5 mb-5">
+        <div>
+          <h2 className="display text-2xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>Activity</h2>
+          <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Your transactions and network</p>
+        </div>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: 'rgba(0,196,125,0.12)', border: '1px solid rgba(0,196,125,0.20)' }}>
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00C47D' }} />
+          <span className="text-xs font-semibold" style={{ color: '#00C47D' }}>Live</span>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mx-5 mb-5 p-1 rounded-2xl" style={{ background: 'rgba(0,0,0,0.05)' }}>
-        {([{ id: 'mine', label: 'My Transactions' }, { id: 'network', label: 'Network Activity' }] as { id: TabId; label: string }[]).map(tab => (
+      <div className="flex gap-1 mx-5 mb-5 p-1 rounded-2xl" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        {([{ id: 'mine', label: 'My Transactions' }, { id: 'network', label: 'Network' }] as { id: TabId; label: string }[]).map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all relative"
             style={{
-              background: activeTab === tab.id ? 'white' : 'transparent',
-              color: activeTab === tab.id ? 'var(--ink)' : 'var(--muted)',
-              boxShadow: activeTab === tab.id ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+              background: activeTab === tab.id ? 'rgba(255,255,255,0.12)' : 'transparent',
+              color: activeTab === tab.id ? 'white' : 'rgba(255,255,255,0.40)',
+              boxShadow: activeTab === tab.id ? '0 2px 8px rgba(0,0,0,0.20)' : 'none',
             }}
           >
             {tab.label}
             {tab.id === 'network' && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--brand)' }} />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse" style={{ background: '#00C47D' }} />
             )}
           </button>
         ))}
@@ -100,9 +109,10 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
                   onClick={() => setFilter(f)}
                   className="px-4 py-2 rounded-xl text-sm font-semibold flex-shrink-0 transition-all active:scale-95"
                   style={{
-                    background: filter === f ? 'var(--brand)' : 'rgba(255,255,255,0.70)',
-                    color: filter === f ? 'white' : 'var(--subtle)',
-                    border: filter === f ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                    background: filter === f ? '#00C47D' : 'rgba(255,255,255,0.07)',
+                    color: filter === f ? '#001a0e' : 'rgba(255,255,255,0.55)',
+                    border: filter === f ? 'none' : '1px solid rgba(255,255,255,0.10)',
+                    boxShadow: filter === f ? '0 4px 16px rgba(0,196,125,0.30)' : 'none',
                   }}
                 >
                   {f}
@@ -111,44 +121,51 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
             </div>
 
             <div className="px-5">
-              <div className="rounded-2xl overflow-hidden" style={glass.card}>
+              <div className="rounded-2xl overflow-hidden" style={darkCard}>
                 {filtered.map((tx, i) => (
                   <div key={tx.id}>
                     <button
-                      className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all active:bg-black/5"
+                      className="w-full flex items-center gap-3 px-4 py-4 text-left transition-all"
+                      style={{ WebkitTapHighlightColor: 'rgba(255,255,255,0.05)' }}
                       onClick={() => setSelectedTx(tx)}
                     >
                       <div className="relative flex-shrink-0">
-                        <Avatar initials={tx.initials} color={tx.color} size={42} />
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: tx.type === 'sent' ? '#FEF3C7' : '#E6F7F1', border: '1.5px solid white' }}>
+                        <Avatar initials={tx.initials} color={tx.color} size={44} />
+                        <div
+                          className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
+                          style={{
+                            background: tx.type === 'sent' ? 'rgba(249,115,22,0.20)' : 'rgba(0,196,125,0.20)',
+                            border: '1.5px solid rgba(255,255,255,0.10)',
+                          }}
+                        >
                           {tx.type === 'sent'
-                            ? <ArrowUpRight size={10} style={{ color: '#D97706' }} />
-                            : <ArrowDownLeft size={10} style={{ color: 'var(--brand)' }} />}
+                            ? <ArrowUpRight size={9} style={{ color: '#F97316' }} />
+                            : <ArrowDownLeft size={9} style={{ color: '#00C47D' }} />}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{tx.name}</p>
+                        <p className="text-sm font-semibold text-white">{tx.name}</p>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          {tx.status === 'onchain' && <CheckCircle2 size={11} style={{ color: 'var(--brand)' }} />}
-                          <span className="text-xs" style={{ color: tx.status === 'onchain' ? 'var(--brand)' : 'var(--muted)' }}>
+                          {tx.status === 'onchain' && <CheckCircle2 size={11} style={{ color: '#00C47D' }} />}
+                          <span className="text-xs" style={{ color: tx.status === 'onchain' ? '#00C47D' : 'rgba(255,255,255,0.40)' }}>
                             {tx.status === 'onchain' ? 'Verified onchain' : 'Successful'}
                           </span>
-                          {tx.note && <span className="text-xs truncate" style={{ color: 'var(--muted)' }}>· {tx.note}</span>}
+                          {tx.note && <span className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.30)' }}>· {tx.note}</span>}
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-bold tabular" style={{ color: tx.amount > 0 ? 'var(--brand)' : 'var(--ink)' }}>
+                        <p className="text-sm font-bold tabular" style={{ color: tx.amount > 0 ? '#00C47D' : 'white' }}>
                           {tx.amount > 0 ? '+' : ''}{formatNaira(tx.amount)}
                         </p>
-                        <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{tx.time}</p>
+                        <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{tx.time}</p>
                       </div>
                     </button>
-                    {i < filtered.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+                    {i < filtered.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />}
                   </div>
                 ))}
               </div>
-              <p className="text-center text-xs mt-4" style={{ color: 'var(--muted)' }}>
-                Tap any transaction to view details or report a problem.
+              <p className="text-center text-xs mt-4" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                Tap any transaction to view details or report an issue.
               </p>
             </div>
           </motion.div>
@@ -160,20 +177,24 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
         <AnimatePresence mode="wait">
           <motion.div key="network" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             {/* Stats banner */}
-            <div className="mx-5 mb-4 rounded-2xl p-4" style={{ background: 'linear-gradient(135deg, #00C47D, #00A86B)', boxShadow: '0 8px 24px rgba(0,168,107,0.25)' }}>
-              <p className="text-xs font-semibold text-white/70 mb-3 uppercase tracking-wide">Network Stats Today</p>
+            <div className="mx-5 mb-4 rounded-2xl p-4" style={{ background: 'linear-gradient(135deg, rgba(0,196,125,0.20) 0%, rgba(0,100,60,0.30) 100%)', border: '1px solid rgba(0,196,125,0.25)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Zap size={14} style={{ color: '#00C47D' }} />
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.60)' }}>Arc Mainnet · Live Stats</p>
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse ml-auto" style={{ background: '#00C47D' }} />
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Payments', value: stats.txCount.toLocaleString(), icon: TrendingUp },
-                  { label: 'Active users', value: stats.activeAddresses.toLocaleString(), icon: Users },
-                  { label: 'Volume', value: `₦${(stats.totalVolumeUsdc * 1600 / 1_000_000).toFixed(1)}M`, icon: TrendingUp },
+                  { label: 'Txns today', value: stats.txCount.toLocaleString(), icon: TrendingUp },
+                  { label: 'Addresses', value: stats.activeAddresses.toLocaleString(), icon: Users },
+                  { label: 'USDC vol.', value: `$${(stats.totalVolumeUsdc).toFixed(0)}`, icon: TrendingUp },
                 ].map(s => {
                   const Icon = s.icon;
                   return (
-                    <div key={s.label} className="rounded-xl p-2.5 text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                      <Icon size={14} style={{ color: 'rgba(255,255,255,0.70)', margin: '0 auto 4px' }} />
-                      <p className="text-base font-bold text-white tabular leading-none">{s.value}</p>
-                      <p className="text-xs text-white/60 mt-1">{s.label}</p>
+                    <div key={s.label} className="rounded-xl p-2.5 text-center" style={{ background: 'rgba(0,0,0,0.25)' }}>
+                      <Icon size={13} style={{ color: '#00C47D', margin: '0 auto 4px' }} />
+                      <p className="text-sm font-bold text-white tabular leading-none">{s.value}</p>
+                      <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</p>
                     </div>
                   );
                 })}
@@ -181,47 +202,71 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
             </div>
 
             {/* Privacy note */}
-            <div className="mx-5 mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl" style={{ background: 'var(--brand-light)' }}>
-              <CheckCircle2 size={13} style={{ color: 'var(--brand)', flexShrink: 0 }} />
-              <p className="text-xs" style={{ color: 'var(--subtle)' }}>
-                All activity is anonymised. No personal data is shared publicly.
+            <div className="mx-5 mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl" style={{ background: 'rgba(0,196,125,0.08)', border: '1px solid rgba(0,196,125,0.15)' }}>
+              <CheckCircle2 size={13} style={{ color: '#00C47D', flexShrink: 0 }} />
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                All activity is pseudonymous. No personal data is shared publicly.
               </p>
             </div>
 
             {/* Live feed */}
             <div className="px-5">
-              <div className="rounded-2xl overflow-hidden" style={glass.card}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00C47D' }} />
+                <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.40)' }}>Mempool</p>
+              </div>
+              <div className="rounded-2xl overflow-hidden" style={darkCard}>
                 <AnimatePresence initial={false}>
-                  {displayEvents.map((event, i) => (
-                    <motion.div
-                      key={event.id}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="flex items-center gap-3 px-4 py-3">
-                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: eventColor(event.type) }} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-pretty" style={{ color: 'var(--ink)' }}>{describeFeedEvent(event)}</p>
-                          <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{event.city} · {timeAgo(event.time)}</p>
+                  {displayEvents.map((event, i) => {
+                    const badge = eventTypeBadge(event.type);
+                    const dot = eventTypeColor(event.type);
+                    return (
+                      <motion.div
+                        key={event.id}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <div className="flex items-start gap-3 px-4 py-3.5">
+                          <div className="mt-1 w-2 h-2 rounded-full flex-shrink-0" style={{ background: dot }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-pretty" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                              {describeFeedEvent(event)}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: badge.bg, color: badge.text }}>
+                                {event.type}
+                              </span>
+                              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                                {event.city} · {timeAgo(event.time)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-sm font-semibold tabular" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                              {formatNaira(event.amount)}
+                            </p>
+                            {event.txHash && (
+                              <p className="text-xs font-mono mt-0.5" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                                {event.txHash.slice(0, 6)}…{event.txHash.slice(-4)}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-sm font-semibold tabular flex-shrink-0" style={{ color: 'var(--ink)' }}>
-                          {formatNaira(event.amount)}
-                        </p>
-                      </div>
-                      {i < displayEvents.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.04)' }} />}
-                    </motion.div>
-                  ))}
+                        {i < displayEvents.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />}
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
               </div>
 
               <button
                 onClick={() => setShowAll(v => !v)}
-                className="w-full flex items-center justify-center gap-1.5 py-3.5 mt-2 rounded-2xl text-sm font-semibold transition-all active:scale-[0.98]"
-                style={{ background: 'rgba(255,255,255,0.70)', color: 'var(--brand)', border: '1px solid rgba(0,0,0,0.07)' }}
+                className="w-full flex items-center justify-center gap-1.5 py-3.5 mt-3 rounded-2xl text-sm font-semibold transition-all active:scale-[0.98]"
+                style={darkInner}
               >
-                {showAll ? 'Show less' : `See ${events.length - 12} more`}
-                <ChevronRight size={15} style={{ transform: showAll ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+                <span style={{ color: '#00C47D' }}>{showAll ? 'Show less' : `See ${Math.max(0, events.length - 12)} more`}</span>
+                <ChevronRight size={15} style={{ color: '#00C47D', transform: showAll ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
               </button>
             </div>
           </motion.div>
