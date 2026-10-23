@@ -5,7 +5,7 @@ import {
   CheckCircle2, AlertCircle, Loader2, Lock, Copy, Check,
   ArrowDownLeft, ShieldCheck,
 } from 'lucide-react';
-import { glass, formatNaira } from './design';
+import { formatNaira } from './design';
 import { useUsdcBalance, NGN_PER_USDC } from './useUsdcBalance';
 
 interface Props {
@@ -59,25 +59,25 @@ function WithdrawalReceipt({
   };
 
   return (
-    <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+    <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
       <div className="px-5 pt-12 pb-4 flex items-center justify-between">
         <span className="text-xs font-bold tracking-widest uppercase" style={{ color: 'var(--brand)' }}>CASHLAND</span>
-        <span className="text-xs" style={{ color: 'var(--muted)' }}>Withdrawal Receipt</span>
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>Withdrawal Receipt</span>
       </div>
 
       <div className="flex-1 px-5 pb-8">
         {/* Hero */}
         <motion.div
           className="rounded-3xl p-6 mb-4 text-center"
-          style={{ ...glass.card, border: '1px solid rgba(0,168,107,0.15)' }}
+          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(0,168,107,0.20)', backdropFilter: 'blur(12px)' }}
           initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
         >
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
             style={{ background: 'linear-gradient(135deg, #00A86B20, #00A86B30)' }}>
             <CheckCircle2 size={32} style={{ color: 'var(--brand)' }} />
           </div>
-          <p className="text-sm font-medium mb-1" style={{ color: 'var(--muted)' }}>Amount sent to bank</p>
-          <p className="display text-4xl font-bold tabular mb-1" style={{ color: 'var(--ink)', letterSpacing: '-0.03em' }}>
+          <p className="text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.50)' }}>Amount sent to bank</p>
+          <p className="display text-4xl font-bold tabular mb-1" style={{ color: 'white', letterSpacing: '-0.03em' }}>
             {formatNaira(ngnAmount)}
           </p>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full"
@@ -90,7 +90,7 @@ function WithdrawalReceipt({
         {/* Details */}
         <motion.div
           className="rounded-2xl overflow-hidden mb-4"
-          style={glass.card}
+          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         >
           {[
@@ -105,10 +105,10 @@ function WithdrawalReceipt({
           ].map(({ label, value }, i, arr) => (
             <div key={label}>
               <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm" style={{ color: 'var(--muted)' }}>{label}</span>
-                <span className="text-sm font-semibold tabular" style={{ color: 'var(--ink)' }}>{value}</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.50)' }}>{label}</span>
+                <span className="text-sm font-semibold tabular" style={{ color: 'white' }}>{value}</span>
               </div>
-              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />}
             </div>
           ))}
         </motion.div>
@@ -117,14 +117,14 @@ function WithdrawalReceipt({
         <motion.button
           onClick={copyRef}
           className="w-full rounded-2xl p-4 flex items-center justify-between mb-6"
-          style={{ ...glass.card, border: '1px dashed rgba(0,168,107,0.3)' }}
+          style={{ background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(0,168,107,0.30)', backdropFilter: 'blur(12px)' }}
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
         >
           <div>
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>Cashland Reference</p>
-            <p className="text-sm font-bold font-mono mt-0.5" style={{ color: 'var(--ink)' }}>{txRef}</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>Cashland Reference</p>
+            <p className="text-sm font-bold font-mono mt-0.5" style={{ color: 'white' }}>{txRef}</p>
           </div>
-          {copied ? <Check size={16} style={{ color: 'var(--brand)' }} /> : <Copy size={16} style={{ color: 'var(--muted)' }} />}
+          {copied ? <Check size={16} style={{ color: 'var(--brand)' }} /> : <Copy size={16} style={{ color: 'rgba(255,255,255,0.50)' }} />}
         </motion.button>
 
         <motion.button
@@ -231,7 +231,7 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
   if (step === 'processing') {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center px-8"
-        style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+        style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
@@ -239,12 +239,12 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
         >
           <Loader2 size={48} style={{ color: 'var(--brand)' }} />
         </motion.div>
-        <p className="display text-xl font-bold mb-2" style={{ color: 'var(--ink)' }}>Processing withdrawal</p>
+        <p className="display text-xl font-bold mb-2" style={{ color: 'white' }}>Processing withdrawal</p>
         <AnimatePresence mode="wait">
           <motion.p
             key={processingMsg}
             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-            className="text-sm text-center" style={{ color: 'var(--muted)' }}
+            className="text-sm text-center" style={{ color: 'rgba(255,255,255,0.50)' }}
           >
             {processingMsg}
           </motion.p>
@@ -263,12 +263,12 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
   // ---- STEP: pin ----
   if (step === 'pin') {
     return (
-      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
         <div className="px-5 pt-12 pb-4 flex items-center gap-3">
-          <button onClick={() => setStep('review')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--surface)' }}>
-            <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+          <button onClick={() => setStep('review')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <ChevronLeft size={20} style={{ color: 'white' }} />
           </button>
-          <span className="text-base font-semibold" style={{ color: 'var(--ink)' }}>Confirm withdrawal</span>
+          <span className="text-base font-semibold" style={{ color: 'white' }}>Confirm withdrawal</span>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center px-8 pb-16">
@@ -276,8 +276,8 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
             style={{ background: 'var(--brand-light)' }}>
             <Lock size={28} style={{ color: 'var(--brand)' }} />
           </div>
-          <p className="display text-2xl font-bold mb-1" style={{ color: 'var(--ink)' }}>Enter your PIN</p>
-          <p className="text-sm mb-8 text-center" style={{ color: 'var(--muted)' }}>
+          <p className="display text-2xl font-bold mb-1" style={{ color: 'white' }}>Enter your PIN</p>
+          <p className="text-sm mb-8 text-center" style={{ color: 'rgba(255,255,255,0.50)' }}>
             Authorise sending {formatNaira(parsedNgn)} to {accountName}
           </p>
 
@@ -306,7 +306,7 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
                 }}
                 disabled={!k}
                 className="h-14 rounded-2xl flex items-center justify-center text-xl font-semibold transition-all active:scale-90"
-                style={{ background: k ? 'rgba(255,255,255,0.9)' : 'transparent', color: 'var(--ink)', boxShadow: k ? '0 2px 8px rgba(0,0,0,0.08)' : 'none' }}
+                style={{ background: k ? 'rgba(255,255,255,0.08)' : 'transparent', color: 'white', boxShadow: k ? '0 2px 8px rgba(0,0,0,0.08)' : 'none' }}
               >
                 {k}
               </button>
@@ -315,7 +315,7 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
 
           <div className="flex items-center gap-1.5 mt-8">
             <ShieldCheck size={13} style={{ color: 'var(--brand)' }} />
-            <span className="text-xs" style={{ color: 'var(--muted)' }}>Protected by Cashland Security</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>Protected by Cashland Security</span>
           </div>
         </div>
       </div>
@@ -325,24 +325,24 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
   // ---- STEP: review ----
   if (step === 'review' && selectedBank) {
     return (
-      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
         <div className="px-5 pt-12 pb-4 flex items-center gap-3">
-          <button onClick={() => setStep('amount')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--surface)' }}>
-            <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+          <button onClick={() => setStep('amount')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <ChevronLeft size={20} style={{ color: 'white' }} />
           </button>
-          <span className="text-base font-semibold" style={{ color: 'var(--ink)' }}>Review withdrawal</span>
+          <span className="text-base font-semibold" style={{ color: 'white' }}>Review withdrawal</span>
         </div>
 
         <div className="flex-1 px-5 pb-8">
           {/* Hero amount */}
           <div className="text-center py-6">
-            <p className="text-sm mb-1" style={{ color: 'var(--muted)' }}>You are withdrawing</p>
-            <p className="display text-5xl font-bold tabular" style={{ color: 'var(--ink)', letterSpacing: '-0.04em' }}>{formatNaira(parsedNgn)}</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>{usdcNeeded.toFixed(4)} USDC will be used</p>
+            <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.50)' }}>You are withdrawing</p>
+            <p className="display text-5xl font-bold tabular" style={{ color: 'white', letterSpacing: '-0.04em' }}>{formatNaira(parsedNgn)}</p>
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.50)' }}>{usdcNeeded.toFixed(4)} USDC will be used</p>
           </div>
 
           {/* Details */}
-          <div className="rounded-2xl overflow-hidden mb-4" style={glass.card}>
+          <div className="rounded-2xl overflow-hidden mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
             {[
               { label: 'Recipient', value: accountName },
               { label: 'Bank', value: selectedBank.short },
@@ -355,10 +355,10 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
             ].map(({ label, value }, i, arr) => (
               <div key={label}>
                 <div className="flex items-center justify-between px-4 py-3.5">
-                  <span className="text-sm" style={{ color: 'var(--muted)' }}>{label}</span>
-                  <span className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{value}</span>
+                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.50)' }}>{label}</span>
+                  <span className="text-sm font-semibold" style={{ color: 'white' }}>{value}</span>
                 </div>
-                {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+                {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />}
               </div>
             ))}
           </div>
@@ -366,11 +366,11 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
           {/* Total */}
           <div className="rounded-2xl p-4 mb-4 flex items-center justify-between"
             style={{ background: 'rgba(0,168,107,0.08)', border: '1px solid rgba(0,168,107,0.2)' }}>
-            <span className="font-semibold" style={{ color: 'var(--ink)' }}>Total deducted</span>
+            <span className="font-semibold" style={{ color: 'white' }}>Total deducted</span>
             <span className="display text-lg font-bold tabular" style={{ color: 'var(--brand)' }}>{formatNaira(parsedNgn)}</span>
           </div>
 
-          <p className="text-xs text-center mb-6" style={{ color: 'var(--muted)' }}>
+          <p className="text-xs text-center mb-6" style={{ color: 'rgba(255,255,255,0.50)' }}>
             Cashland converts your USDC to Naira and sends to your bank account.
           </p>
 
@@ -390,24 +390,24 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
   // ---- STEP: amount ----
   if (step === 'amount') {
     return (
-      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
         <div className="px-5 pt-12 pb-4 flex items-center gap-3">
-          <button onClick={() => setStep('account')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--surface)' }}>
-            <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+          <button onClick={() => setStep('account')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <ChevronLeft size={20} style={{ color: 'white' }} />
           </button>
-          <span className="text-base font-semibold" style={{ color: 'var(--ink)' }}>How much to withdraw?</span>
+          <span className="text-base font-semibold" style={{ color: 'white' }}>How much to withdraw?</span>
         </div>
 
         <div className="flex-1 px-5 pb-8">
           {/* Recipient summary */}
           {selectedBank && (
-            <div className="rounded-2xl p-4 mb-6 flex items-center gap-3" style={glass.card}>
+            <div className="rounded-2xl p-4 mb-6 flex items-center gap-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: selectedBank.color + '20' }}>
                 <Building2 size={18} style={{ color: selectedBank.color }} />
               </div>
               <div>
-                <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{accountName}</p>
-                <p className="text-xs" style={{ color: 'var(--muted)' }}>{selectedBank.short} · {accountNumber}</p>
+                <p className="text-sm font-semibold" style={{ color: 'white' }}>{accountName}</p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>{selectedBank.short} · {accountNumber}</p>
               </div>
               <CheckCircle2 size={18} style={{ color: 'var(--brand)' }} className="ml-auto" />
             </div>
@@ -415,7 +415,7 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
 
           {/* Big amount input */}
           <div className="text-center mb-4">
-            <p className="text-sm mb-4" style={{ color: 'var(--muted)' }}>Enter amount in Naira</p>
+            <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.50)' }}>Enter amount in Naira</p>
             <div className="flex items-center justify-center gap-1">
               <span className="display text-4xl font-semibold" style={{ color: parsedNgn > 0 ? 'var(--ink)' : 'var(--muted)' }}>₦</span>
               <input
@@ -424,11 +424,11 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
                 onChange={e => setAmount(e.target.value)}
                 placeholder="0"
                 className="display text-5xl font-bold tabular bg-transparent outline-none text-center min-w-0"
-                style={{ color: 'var(--ink)', letterSpacing: '-0.04em', width: Math.max(120, String(amount || '0').length * 32) }}
+                style={{ color: 'white', letterSpacing: '-0.04em', width: Math.max(120, String(amount || '0').length * 32) }}
               />
             </div>
             {parsedNgn > 0 && (
-              <p className="text-sm mt-2" style={{ color: 'var(--muted)' }}>
+              <p className="text-sm mt-2" style={{ color: 'rgba(255,255,255,0.50)' }}>
                 {usdcNeeded.toFixed(4)} USDC · rate ₦{NGN_PER_USDC.toLocaleString()}/USDC
               </p>
             )}
@@ -454,8 +454,8 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
           {/* Balance info */}
           <div className="rounded-2xl p-4 mb-4" style={{ background: 'rgba(0,168,107,0.06)', border: '1px solid rgba(0,168,107,0.12)' }}>
             <div className="flex items-center justify-between">
-              <span className="text-sm" style={{ color: 'var(--muted)' }}>Available</span>
-              <span className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.50)' }}>Available</span>
+              <span className="text-sm font-semibold" style={{ color: 'white' }}>
                 {isConnected ? formattedUsdc + ' USDC' : 'Connect wallet'}
               </span>
             </div>
@@ -490,12 +490,12 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
   // ---- STEP: account ----
   if (step === 'account') {
     return (
-      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
         <div className="px-5 pt-12 pb-4 flex items-center gap-3">
-          <button onClick={() => setStep('bank')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--surface)' }}>
-            <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+          <button onClick={() => setStep('bank')} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <ChevronLeft size={20} style={{ color: 'white' }} />
           </button>
-          <span className="text-base font-semibold" style={{ color: 'var(--ink)' }}>Enter account number</span>
+          <span className="text-base font-semibold" style={{ color: 'white' }}>Enter account number</span>
         </div>
 
         <div className="flex-1 px-5 pb-8">
@@ -505,13 +505,13 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: selectedBank.color }}>
                 <Building2 size={15} color="white" />
               </div>
-              <span className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{selectedBank.short}</span>
+              <span className="text-sm font-semibold" style={{ color: 'white' }}>{selectedBank.short}</span>
               <button onClick={() => setStep('bank')} className="ml-auto text-xs" style={{ color: 'var(--brand)' }}>Change</button>
             </div>
           )}
 
-          <p className="text-sm mb-2" style={{ color: 'var(--muted)' }}>10-digit NUBAN account number</p>
-          <div className="rounded-2xl mb-3" style={{ ...glass.card, border: '1.5px solid rgba(0,168,107,0.2)' }}>
+          <p className="text-sm mb-2" style={{ color: 'rgba(255,255,255,0.50)' }}>10-digit NUBAN account number</p>
+          <div className="rounded-2xl mb-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1.5px solid rgba(0,168,107,0.25)', backdropFilter: 'blur(12px)' }}>
             <input
               type="tel"
               maxLength={10}
@@ -519,7 +519,7 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
               onChange={e => setAccountNumber(e.target.value.replace(/\D/g, ''))}
               placeholder="0000000000"
               className="w-full px-4 py-4 bg-transparent text-xl font-bold tabular tracking-widest outline-none"
-              style={{ color: 'var(--ink)' }}
+              style={{ color: 'white' }}
             />
           </div>
 
@@ -529,14 +529,14 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="flex items-center gap-2 px-1 mb-4">
                 <Loader2 size={14} className="animate-spin" style={{ color: 'var(--brand)' }} />
-                <span className="text-sm" style={{ color: 'var(--muted)' }}>Verifying account...</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.50)' }}>Verifying account...</span>
               </motion.div>
             )}
             {!resolving && accountName && (
               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-2 px-1 mb-4">
                 <CheckCircle2 size={16} style={{ color: 'var(--brand)' }} />
-                <span className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{accountName}</span>
+                <span className="text-sm font-semibold" style={{ color: 'white' }}>{accountName}</span>
                 <span className="text-xs ml-auto" style={{ color: 'var(--brand)' }}>Verified</span>
               </motion.div>
             )}
@@ -549,7 +549,7 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
             )}
           </AnimatePresence>
 
-          <p className="text-xs mb-8" style={{ color: 'var(--muted)' }}>
+          <p className="text-xs mb-8" style={{ color: 'rgba(255,255,255,0.50)' }}>
             Your bank account name will be displayed for confirmation before any money is sent.
           </p>
 
@@ -569,35 +569,35 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
 
   // ---- STEP: bank selection ----
   return (
-    <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}>
+    <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}>
       <div className="px-5 pt-12 pb-4 flex items-center gap-3">
-        <button onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--surface)' }}>
-          <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+        <button onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <ChevronLeft size={20} style={{ color: 'white' }} />
         </button>
         <div>
-          <span className="text-base font-semibold" style={{ color: 'var(--ink)' }}>Withdraw to Bank</span>
-          <p className="text-xs" style={{ color: 'var(--muted)' }}>Select your bank</p>
+          <span className="text-base font-semibold" style={{ color: 'white' }}>Withdraw to Bank</span>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>Select your bank</p>
         </div>
       </div>
 
       {/* Search */}
       <div className="px-5 mb-3">
         <div className="relative">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted)' }} />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.50)' }} />
           <input
             type="text"
             value={bankSearch}
             onChange={e => setBankSearch(e.target.value)}
             placeholder="Search banks..."
             className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm outline-none"
-            style={{ ...glass.card, color: 'var(--ink)' }}
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}
           />
         </div>
       </div>
 
       {/* Bank list */}
       <div className="flex-1 overflow-y-auto px-5 pb-8">
-        <div className="rounded-2xl overflow-hidden" style={glass.card}>
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
           {filteredBanks.map((bank, i) => (
             <div key={bank.code}>
               <motion.button
@@ -608,15 +608,15 @@ export default function WithdrawScreen({ onClose, onWithdrawn }: Props) {
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: bank.color + '20' }}>
                   <Building2 size={18} style={{ color: bank.color }} />
                 </div>
-                <span className="flex-1 text-sm font-medium" style={{ color: 'var(--ink)' }}>{bank.name}</span>
-                <ChevronRight size={16} style={{ color: 'var(--muted)' }} />
+                <span className="flex-1 text-sm font-medium" style={{ color: 'white' }}>{bank.name}</span>
+                <ChevronRight size={16} style={{ color: 'rgba(255,255,255,0.50)' }} />
               </motion.button>
-              {i < filteredBanks.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+              {i < filteredBanks.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />}
             </div>
           ))}
           {filteredBanks.length === 0 && (
             <div className="py-12 text-center">
-              <p className="text-sm" style={{ color: 'var(--muted)' }}>No banks found for "{bankSearch}"</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.50)' }}>No banks found for "{bankSearch}"</p>
             </div>
           )}
         </div>

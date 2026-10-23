@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Share2, Copy, Check, QrCode, Download, AlertTriangle } from 'lucide-react';
-import { glass, brandGradient, formatNaira }  from './design';
+import { brandGradient, formatNaira }  from './design';
 import { Avatar } from './HomeScreen';
 
 interface Props {
@@ -67,25 +67,25 @@ export default function ReceiveScreen({ onClose }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' }}
+      style={{ background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' }}
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-5 pt-12 pb-4">
         <button
           onClick={onClose}
           className="w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.70)', border: '1px solid rgba(0,0,0,0.08)' }}
+          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(0,0,0,0.08)' }}
         >
-          <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+          <ChevronLeft size={20} style={{ color: 'white' }} />
         </button>
-        <h1 className="display text-lg font-bold" style={{ color: 'var(--ink)' }}>Receive Money</h1>
+        <h1 className="display text-lg font-bold" style={{ color: 'white' }}>Receive Money</h1>
       </div>
 
       {/* Tabs */}
       <div className="px-5 mb-5">
         <div
           className="flex rounded-2xl p-1 gap-1"
-          style={{ background: 'rgba(255,255,255,0.60)', border: '1px solid rgba(255,255,255,0.70)' }}
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.70)' }}
         >
           {tabs.map(t => (
             <button
@@ -116,14 +116,14 @@ export default function ReceiveScreen({ onClose }: Props) {
             {/* Cashland Tab */}
             {tab === 'cashtag' && (
               <div className="flex flex-col items-center">
-                <div className="w-full rounded-3xl p-6 mb-5 text-center" style={glass.card}>
+                <div className="w-full rounded-3xl p-6 mb-5 text-center" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
                   <Avatar initials="MI" color="#00A86B" size={72} />
-                  <h2 className="display text-xl font-bold mt-4 mb-1" style={{ color: 'var(--ink)' }}>Musa Ibrahim</h2>
+                  <h2 className="display text-xl font-bold mt-4 mb-1" style={{ color: 'white' }}>Musa Ibrahim</h2>
                   <p className="text-lg font-semibold" style={{ color: 'var(--brand)' }}>@musa</p>
-                  <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>0803 *** 4567</p>
+                  <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.50)' }}>0803 *** 4567</p>
 
                   <div className="mt-4 pt-4 border-t" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
-                    <p className="text-xs text-pretty" style={{ color: 'var(--subtle)' }}>
+                    <p className="text-xs text-pretty" style={{ color: 'rgba(255,255,255,0.60)' }}>
                       People on Cashland can send money using your phone number or CashTag.
                     </p>
                   </div>
@@ -141,11 +141,11 @@ export default function ReceiveScreen({ onClose }: Props) {
             {/* QR Tab */}
             {tab === 'qr' && (
               <div className="flex flex-col items-center">
-                <div className="w-full rounded-3xl p-6 mb-5 flex flex-col items-center" style={glass.card}>
-                  <p className="text-sm font-semibold mb-4" style={{ color: 'var(--subtle)' }}>Scan to pay @musa</p>
+                <div className="w-full rounded-3xl p-6 mb-5 flex flex-col items-center" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
+                  <p className="text-sm font-semibold mb-4" style={{ color: 'rgba(255,255,255,0.60)' }}>Scan to pay @musa</p>
                   <div
                     className="p-4 rounded-2xl"
-                    style={{ background: 'white', boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }}
+                    style={{ background: '#0a1628', boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }}
                   >
                     <QrCodeSvg size={180} />
                   </div>
@@ -174,7 +174,7 @@ export default function ReceiveScreen({ onClose }: Props) {
                     </button>
                     <button
                       className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
-                      style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--ink)' }}
+                      style={{ background: 'rgba(255,255,255,0.08)', color: 'white' }}
                     >
                       <Download size={16} /> Save QR
                     </button>
@@ -182,7 +182,7 @@ export default function ReceiveScreen({ onClose }: Props) {
                   <button
                     onClick={() => setShowAmountInput(!showAmountInput)}
                     className="w-full py-3.5 rounded-2xl text-sm font-semibold"
-                    style={{ color: 'var(--subtle)', background: 'rgba(255,255,255,0.60)', border: '1px solid rgba(0,0,0,0.08)' }}
+                    style={{ color: 'rgba(255,255,255,0.60)', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(0,0,0,0.08)' }}
                   >
                     Request specific amount
                   </button>
@@ -190,19 +190,19 @@ export default function ReceiveScreen({ onClose }: Props) {
                     {showAmountInput && (
                       <motion.div
                         className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
-                        style={glass.card}
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                       >
-                        <span className="text-base font-semibold" style={{ color: 'var(--muted)' }}>₦</span>
+                        <span className="text-base font-semibold" style={{ color: 'rgba(255,255,255,0.50)' }}>₦</span>
                         <input
                           type="number"
                           placeholder="Enter amount"
                           value={requestAmount}
                           onChange={e => setRequestAmount(e.target.value)}
                           className="flex-1 bg-transparent text-base font-semibold outline-none tabular"
-                          style={{ color: 'var(--ink)' }}
+                          style={{ color: 'white' }}
                         />
                       </motion.div>
                     )}
@@ -214,15 +214,15 @@ export default function ReceiveScreen({ onClose }: Props) {
             {/* Wallet Address Tab */}
             {tab === 'address' && (
               <div className="flex flex-col">
-                <div className="rounded-3xl p-5 mb-4" style={glass.card}>
-                  <p className="text-xs font-semibold uppercase mb-3" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>
+                <div className="rounded-3xl p-5 mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
+                  <p className="text-xs font-semibold uppercase mb-3" style={{ color: 'rgba(255,255,255,0.50)', letterSpacing: '0.08em' }}>
                     Your onchain wallet
                   </p>
                   <div
                     className="px-4 py-3.5 rounded-xl mb-3"
-                    style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.07)' }}
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(0,0,0,0.07)' }}
                   >
-                    <p className="mono text-sm break-all" style={{ color: 'var(--ink)' }}>
+                    <p className="mono text-sm break-all" style={{ color: 'white' }}>
                       0x71F3a8c492bE14D9...92AD
                     </p>
                   </div>
@@ -237,7 +237,7 @@ export default function ReceiveScreen({ onClose }: Props) {
                     </button>
                     <button
                       className="flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
-                      style={{ background: 'rgba(0,0,0,0.05)', color: 'var(--ink)' }}
+                      style={{ background: 'rgba(255,255,255,0.08)', color: 'white' }}
                     >
                       <QrCode size={15} /> Show QR
                     </button>
@@ -246,10 +246,10 @@ export default function ReceiveScreen({ onClose }: Props) {
 
                 <div
                   className="flex items-start gap-2.5 px-4 py-3.5 rounded-2xl"
-                  style={{ background: '#FEF3C7', border: '1px solid #FCD34D30' }}
+                  style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid #FCD34D30' }}
                 >
                   <AlertTriangle size={16} style={{ color: '#D97706', flexShrink: 0, marginTop: 1 }} />
-                  <p className="text-sm text-pretty" style={{ color: '#92400E' }}>
+                  <p className="text-sm text-pretty" style={{ color: 'rgba(245,158,11,0.90)' }}>
                     Only send supported assets to this wallet. Sending unsupported tokens may result in permanent loss.
                   </p>
                 </div>
@@ -258,7 +258,7 @@ export default function ReceiveScreen({ onClose }: Props) {
                   className="mt-4 px-4 py-3.5 rounded-2xl"
                   style={{ background: 'var(--brand-light)' }}
                 >
-                  <p className="text-xs text-center" style={{ color: 'var(--subtle)' }}>
+                  <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.60)' }}>
                     For most people, using your phone number or CashTag is easier. Share your wallet address only for advanced transfers.
                   </p>
                 </div>
