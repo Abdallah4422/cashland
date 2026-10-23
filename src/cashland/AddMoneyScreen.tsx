@@ -6,7 +6,7 @@ import {
   Wallet, ShieldCheck, Clock, Receipt, ExternalLink,
 } from 'lucide-react';
 import { useAccount } from 'wagmi';
-import { glass, navyGradient, brandGradient, formatNaira } from './design';
+import { navyGradient, brandGradient, formatNaira } from './design';
 import { useUsdcBalance, NGN_PER_USDC } from './useUsdcBalance';
 import { pushDepositNotification } from './useNotifications';
 
@@ -27,10 +27,10 @@ function BackHeader({ title, onBack }: { title: string; onBack: () => void }) {
   return (
     <div className="flex items-center gap-3 px-5 pt-12 pb-4 flex-shrink-0">
       <button onClick={onBack} className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-        style={{ background: 'rgba(255,255,255,0.70)', border: '1px solid rgba(0,0,0,0.08)' }}>
-        <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+        style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+        <ChevronLeft size={20} style={{ color: 'white' }} />
       </button>
-      <h1 className="display text-lg font-bold" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>{title}</h1>
+      <h1 className="display text-lg font-bold" style={{ color: 'white', letterSpacing: '-0.02em' }}>{title}</h1>
     </div>
   );
 }
@@ -65,7 +65,7 @@ function OnrampReceipt({
         </div>
 
         {/* Receipt body */}
-        <div className="px-5 py-4" style={{ background: 'white' }}>
+        <div className="px-5 py-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
           {[
             { label: 'USDC credited', value: `${usdc.toFixed(4)} USDC`, accent: true },
             { label: 'Exchange rate', value: `₦${USDC_RATE.toLocaleString()} / USDC` },
@@ -78,7 +78,7 @@ function OnrampReceipt({
           ].map((row, i, arr) => (
             <div key={row.label}>
               <div className="flex items-center justify-between py-3">
-                <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>{row.label}</span>
                 <span
                   className={`text-sm font-semibold ${row.mono ? 'mono text-xs' : ''}`}
                   style={{ color: row.success ? 'var(--brand)' : row.accent ? 'var(--brand)' : 'var(--ink)' }}
@@ -86,7 +86,7 @@ function OnrampReceipt({
                   {row.value}
                 </span>
               </div>
-              {i < arr.length - 1 && <div className="h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+              {i < arr.length - 1 && <div className="h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />}
             </div>
           ))}
         </div>
@@ -172,23 +172,23 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
               </div>
             </div>
           </div>
-          <h2 className="display text-xl font-bold mb-1" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>
+          <h2 className="display text-xl font-bold mb-1" style={{ color: 'white', letterSpacing: '-0.02em' }}>
             Waiting for transfer
           </h2>
-          <p className="text-sm text-center text-pretty mb-2" style={{ color: 'var(--subtle)' }}>
+          <p className="text-sm text-center text-pretty mb-2" style={{ color: 'rgba(255,255,255,0.60)' }}>
             We're watching for your transfer of{' '}
             <span className="font-semibold" style={{ color: 'var(--brand)' }}>{formatNaira(parsedAmount)}</span>
           </p>
           <div className="flex items-center gap-1.5">
             <RefreshCw size={13} style={{ color: 'var(--brand)' }} className="animate-spin" />
-            <span className="text-xs" style={{ color: 'var(--muted)' }}>Checking every second...</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>Checking every second...</span>
           </div>
         </div>
 
         {/* Account reminder */}
-        <div className="rounded-2xl overflow-hidden mb-4" style={glass.card}>
-          <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
-            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>Transfer to</p>
+        <div className="rounded-2xl overflow-hidden mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
+          <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.50)', letterSpacing: '0.08em' }}>Transfer to</p>
           </div>
           {[
             { label: 'Account', value: virtualAccount.accountNumber, copy: true },
@@ -197,18 +197,18 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
           ].map((row, i, arr) => (
             <div key={row.label}>
               <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>{row.label}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold mono" style={{ color: 'var(--ink)' }}>{row.value}</span>
+                  <span className="text-sm font-semibold mono" style={{ color: 'white' }}>{row.value}</span>
                   {row.copy && (
                     <button onClick={() => handleCopy(row.label, row.value)}
-                      className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'var(--brand-light)' }}>
+                      className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,168,107,0.15)' }}>
                       {copiedField === row.label ? <Check size={11} style={{ color: 'var(--brand)' }} /> : <Copy size={11} style={{ color: 'var(--brand)' }} />}
                     </button>
                   )}
                 </div>
               </div>
-              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />}
             </div>
           ))}
         </div>
@@ -220,7 +220,7 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
           </p>
         </div>
 
-        <button onClick={() => setStep('amount')} className="w-full py-3 text-sm font-medium" style={{ color: 'var(--muted)' }}>
+        <button onClick={() => setStep('amount')} className="w-full py-3 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.50)' }}>
           Cancel — go back
         </button>
       </div>
@@ -244,8 +244,8 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
           </div>
         </div>
 
-        <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ink)' }}>Transfer to this account</p>
-        <div className="rounded-2xl overflow-hidden mb-4" style={glass.card}>
+        <p className="text-sm font-semibold mb-3" style={{ color: 'white' }}>Transfer to this account</p>
+        <div className="rounded-2xl overflow-hidden mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
           {[
             { label: 'Bank', value: virtualAccount.bank },
             { label: 'Account name', value: virtualAccount.accountName },
@@ -256,27 +256,27 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
           ].map((row, i, arr) => (
             <div key={row.label}>
               <div className="flex items-center justify-between px-4 py-3.5">
-                <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>{row.label}</span>
                 <div className="flex items-center gap-2">
                   <span className={`text-sm font-semibold mono`} style={{ color: row.bold ? 'var(--brand)' : 'var(--ink)' }}>
                     {row.value}
                   </span>
                   {row.copy && (
                     <button onClick={() => handleCopy(row.label, row.value)}
-                      className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'var(--brand-light)' }}>
+                      className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,168,107,0.15)' }}>
                       {copiedField === row.label ? <Check size={11} style={{ color: 'var(--brand)' }} /> : <Copy size={11} style={{ color: 'var(--brand)' }} />}
                     </button>
                   )}
                 </div>
               </div>
-              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />}
             </div>
           ))}
         </div>
 
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl mb-6" style={{ background: 'var(--brand-light)' }}>
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl mb-6" style={{ background: 'rgba(0,168,107,0.15)' }}>
           <Clock size={14} style={{ color: 'var(--brand)', flexShrink: 0 }} />
-          <p className="text-xs" style={{ color: 'var(--subtle)' }}>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.60)' }}>
             Money usually arrives within 60 seconds of your transfer clearing.
           </p>
         </div>
@@ -297,24 +297,24 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
   // Amount step
   return (
     <div className="flex flex-col min-h-full px-5 pb-8">
-      <p className="text-sm mb-5" style={{ color: 'var(--subtle)' }}>
+      <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.60)' }}>
         Transfer from any Nigerian bank account. We'll credit your Cashland balance instantly.
       </p>
 
       {/* Amount input */}
-      <div className="rounded-2xl p-5 mb-3" style={glass.card}>
-        <p className="text-xs font-semibold uppercase mb-2" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>Amount to add</p>
+      <div className="rounded-2xl p-5 mb-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
+        <p className="text-xs font-semibold uppercase mb-2" style={{ color: 'rgba(255,255,255,0.50)', letterSpacing: '0.08em' }}>Amount to add</p>
         <div className="flex items-baseline gap-2 mb-3">
-          <span className="display text-2xl font-bold" style={{ color: 'var(--muted)' }}>₦</span>
+          <span className="display text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>₦</span>
           <input
             type="number" inputMode="decimal" placeholder="0" autoFocus
             value={ngnAmount} onChange={e => setNgnAmount(e.target.value)}
             className="display flex-1 text-4xl font-bold bg-transparent outline-none tabular"
-            style={{ color: 'var(--ink)', letterSpacing: '-0.03em' }}
+            style={{ color: 'white', letterSpacing: '-0.03em' }}
           />
         </div>
         {parsedAmount > 0 && (
-          <p className="text-xs" style={{ color: 'var(--subtle)' }}>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.60)' }}>
             = {usdc.toFixed(4)} USDC at ₦{USDC_RATE.toLocaleString()} / USDC
           </p>
         )}
@@ -328,7 +328,7 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
             style={{
               background: ngnAmount === String(v) ? 'var(--brand)' : 'rgba(255,255,255,0.75)',
               color: ngnAmount === String(v) ? 'white' : 'var(--ink)',
-              border: `1.5px solid ${ngnAmount === String(v) ? 'var(--brand)' : 'rgba(0,0,0,0.08)'}`,
+              border: `1.5px solid ${ngnAmount === String(v) ? '#00A86B' : 'rgba(255,255,255,0.12)'}`,
             }}>
             {formatNaira(v)}
           </button>
@@ -339,7 +339,7 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
       {parsedAmount > 0 && (
         <motion.div
           className="rounded-2xl overflow-hidden mb-5"
-          style={glass.card}
+          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         >
           {[
@@ -349,12 +349,12 @@ function BankTransferFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess
           ].map((row, i, arr) => (
             <div key={row.label}>
               <div className="flex justify-between items-center px-4 py-3">
-                <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>{row.label}</span>
                 <span className="text-sm font-semibold" style={{ color: row.success ? 'var(--brand)' : row.bold ? 'var(--brand)' : 'var(--ink)' }}>
                   {row.value}
                 </span>
               </div>
-              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+              {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />}
             </div>
           ))}
         </motion.div>
@@ -380,7 +380,7 @@ function detectCardType(number: string): { label: string; color: string } {
   if (n.startsWith('4')) return { label: 'Visa', color: '#1A1F71' };
   if (n.startsWith('5') || n.startsWith('2')) return { label: 'Mastercard', color: '#EB001B' };
   if (n.startsWith('6')) return { label: 'Verve', color: '#00A86B' };
-  return { label: '', color: 'var(--muted)' };
+  return { label: '', color: 'rgba(255,255,255,0.50)' };
 }
 
 function CardTopUpFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess: (amount: number) => void }) {
@@ -423,11 +423,11 @@ function CardTopUpFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess: (
     return (
       <div className="flex flex-col items-center justify-center min-h-full px-6 text-center">
         <motion.div animate={{ scale: [1, 1.06, 1] }} transition={{ repeat: Infinity, duration: 1.4 }}
-          className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: 'var(--brand-light)' }}>
+          className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: 'rgba(0,168,107,0.15)' }}>
           <Loader2 size={40} style={{ color: 'var(--brand)' }} className="animate-spin" />
         </motion.div>
-        <h2 className="display text-xl font-bold mb-2" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Processing payment...</h2>
-        <p className="text-sm" style={{ color: 'var(--subtle)' }}>Charging your card and converting to USDC.</p>
+        <h2 className="display text-xl font-bold mb-2" style={{ color: 'white', letterSpacing: '-0.02em' }}>Processing payment...</h2>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>Charging your card and converting to USDC.</p>
       </div>
     );
   }
@@ -436,32 +436,32 @@ function CardTopUpFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess: (
     return (
       <div className="flex flex-col min-h-full px-5 pb-8">
         <div className="flex flex-col items-center text-center py-8">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'var(--brand-light)' }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'rgba(0,168,107,0.15)' }}>
             <ShieldCheck size={32} style={{ color: 'var(--brand)' }} />
           </div>
-          <h2 className="display text-xl font-bold mb-2" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Verify payment</h2>
-          <p className="text-sm text-pretty max-w-xs" style={{ color: 'var(--subtle)' }}>
-            Your bank sent a one-time code to your registered phone number ending in <span className="font-semibold" style={{ color: 'var(--ink)' }}>••• 4567</span>
+          <h2 className="display text-xl font-bold mb-2" style={{ color: 'white', letterSpacing: '-0.02em' }}>Verify payment</h2>
+          <p className="text-sm text-pretty max-w-xs" style={{ color: 'rgba(255,255,255,0.60)' }}>
+            Your bank sent a one-time code to your registered phone number ending in <span className="font-semibold" style={{ color: 'white' }}>••• 4567</span>
           </p>
         </div>
 
-        <div className="rounded-2xl p-4 text-center mb-5" style={{ background: 'var(--brand-light)' }}>
-          <p className="text-xs font-medium" style={{ color: 'var(--subtle)' }}>Authorising payment of</p>
+        <div className="rounded-2xl p-4 text-center mb-5" style={{ background: 'rgba(0,168,107,0.15)' }}>
+          <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.60)' }}>Authorising payment of</p>
           <p className="display text-2xl font-bold tabular" style={{ color: 'var(--brand)', letterSpacing: '-0.02em' }}>{formatNaira(parsedAmount)}</p>
         </div>
 
-        <p className="text-sm font-semibold mb-3" style={{ color: 'var(--subtle)' }}>Enter the 6-digit OTP</p>
-        <div className="flex items-center gap-3 px-4 py-4 rounded-2xl mb-5" style={glass.card}>
+        <p className="text-sm font-semibold mb-3" style={{ color: 'rgba(255,255,255,0.60)' }}>Enter the 6-digit OTP</p>
+        <div className="flex items-center gap-3 px-4 py-4 rounded-2xl mb-5" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
           <input
             type="tel" inputMode="numeric" maxLength={6} autoFocus
             placeholder="000000"
             value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
             className="flex-1 bg-transparent text-2xl font-bold mono outline-none tracking-widest text-center tabular"
-            style={{ color: 'var(--ink)' }}
+            style={{ color: 'white' }}
           />
         </div>
 
-        <p className="text-xs text-center mb-6" style={{ color: 'var(--muted)' }}>
+        <p className="text-xs text-center mb-6" style={{ color: 'rgba(255,255,255,0.50)' }}>
           Didn't get a code?{' '}
           <button className="font-semibold" style={{ color: 'var(--brand)' }}>Resend OTP</button>
         </p>
@@ -482,24 +482,24 @@ function CardTopUpFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess: (
 
   return (
     <div className="flex flex-col min-h-full px-5 pb-8">
-      <p className="text-sm mb-5" style={{ color: 'var(--subtle)' }}>
+      <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.60)' }}>
         Top up your Cashland balance with your Visa, Mastercard, or Verve debit card.
       </p>
 
       {/* Amount */}
-      <div className="rounded-2xl p-5 mb-3" style={glass.card}>
-        <p className="text-xs font-semibold uppercase mb-2" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>Amount</p>
+      <div className="rounded-2xl p-5 mb-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
+        <p className="text-xs font-semibold uppercase mb-2" style={{ color: 'rgba(255,255,255,0.50)', letterSpacing: '0.08em' }}>Amount</p>
         <div className="flex items-baseline gap-2 mb-2">
-          <span className="display text-2xl font-bold" style={{ color: 'var(--muted)' }}>₦</span>
+          <span className="display text-2xl font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>₦</span>
           <input
             type="number" inputMode="decimal" placeholder="0"
             value={amount} onChange={e => setAmount(e.target.value)}
             className="display flex-1 text-4xl font-bold bg-transparent outline-none tabular"
-            style={{ color: 'var(--ink)', letterSpacing: '-0.03em' }}
+            style={{ color: 'white', letterSpacing: '-0.03em' }}
           />
         </div>
         {parsedAmount > 0 && (
-          <p className="text-xs" style={{ color: 'var(--subtle)' }}>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.60)' }}>
             = {ngnToUsdc(parsedAmount).toFixed(4)} USDC
           </p>
         )}
@@ -508,17 +508,17 @@ function CardTopUpFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess: (
         {chips.map(v => (
           <button key={v} onClick={() => setAmount(String(v))}
             className="px-3.5 py-2 rounded-xl text-sm font-semibold flex-shrink-0 transition-all active:scale-95"
-            style={{ background: amount === String(v) ? 'var(--brand)' : 'rgba(255,255,255,0.75)', color: amount === String(v) ? 'white' : 'var(--ink)', border: `1.5px solid ${amount === String(v) ? 'var(--brand)' : 'rgba(0,0,0,0.08)'}` }}>
+            style={{ background: amount === String(v) ? 'var(--brand)' : 'rgba(255,255,255,0.75)', color: amount === String(v) ? 'white' : 'var(--ink)', border: `1.5px solid ${amount === String(v) ? '#00A86B' : 'rgba(255,255,255,0.12)'}` }}>
             {formatNaira(v)}
           </button>
         ))}
       </div>
 
       {/* Card form */}
-      <div className="rounded-2xl overflow-hidden mb-3" style={glass.card}>
+      <div className="rounded-2xl overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
         <div className="px-4 py-3.5">
           <div className="flex items-center justify-between mb-1.5">
-            <p className="text-xs font-semibold uppercase" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>Card number</p>
+            <p className="text-xs font-semibold uppercase" style={{ color: 'rgba(255,255,255,0.50)', letterSpacing: '0.08em' }}>Card number</p>
             {cardType.label && (
               <span className="text-xs font-bold" style={{ color: cardType.color }}>{cardType.label}</span>
             )}
@@ -527,35 +527,35 @@ function CardTopUpFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess: (
             type="text" inputMode="numeric" placeholder="0000 0000 0000 0000"
             value={card} onChange={e => setCard(formatCard(e.target.value))}
             className="w-full bg-transparent text-base font-semibold mono outline-none"
-            style={{ color: 'var(--ink)' }}
+            style={{ color: 'white' }}
           />
         </div>
-        <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />
+        <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
         <div className="flex">
-          <div className="flex-1 px-4 py-3.5 border-r" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
-            <p className="text-xs font-semibold uppercase mb-1.5" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>Expiry</p>
+          <div className="flex-1 px-4 py-3.5 border-r" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+            <p className="text-xs font-semibold uppercase mb-1.5" style={{ color: 'rgba(255,255,255,0.50)', letterSpacing: '0.08em' }}>Expiry</p>
             <input
               type="text" inputMode="numeric" placeholder="MM/YY"
               value={expiry} onChange={e => setExpiry(formatExpiry(e.target.value))}
               className="w-full bg-transparent text-base font-semibold mono outline-none"
-              style={{ color: 'var(--ink)' }}
+              style={{ color: 'white' }}
             />
           </div>
           <div className="flex-1 px-4 py-3.5">
-            <p className="text-xs font-semibold uppercase mb-1.5" style={{ color: 'var(--muted)', letterSpacing: '0.08em' }}>CVV</p>
+            <p className="text-xs font-semibold uppercase mb-1.5" style={{ color: 'rgba(255,255,255,0.50)', letterSpacing: '0.08em' }}>CVV</p>
             <input
               type="password" inputMode="numeric" maxLength={3} placeholder="•••"
               value={cvv} onChange={e => setCvv(e.target.value.replace(/\D/g, '').slice(0, 3))}
               className="w-full bg-transparent text-base font-semibold outline-none"
-              style={{ color: 'var(--ink)' }}
+              style={{ color: 'white' }}
             />
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-5" style={{ background: 'var(--brand-light)' }}>
+      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-5" style={{ background: 'rgba(0,168,107,0.15)' }}>
         <ShieldCheck size={13} style={{ color: 'var(--brand)' }} />
-        <p className="text-xs" style={{ color: 'var(--subtle)' }}>256-bit encrypted. Your card details are never stored by Cashland.</p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.60)' }}>256-bit encrypted. Your card details are never stored by Cashland.</p>
       </div>
 
       <div className="mt-auto">
@@ -624,44 +624,44 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
     return (
       <div className="flex flex-col items-center justify-center min-h-full px-6 text-center">
         <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
-          className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: 'var(--brand-light)' }}>
+          className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ background: 'rgba(0,168,107,0.15)' }}>
           <RefreshCw size={36} style={{ color: 'var(--brand)' }} />
         </motion.div>
-        <h2 className="display text-xl font-bold mb-2" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>Scanning blockchain...</h2>
-        <p className="text-sm" style={{ color: 'var(--subtle)' }}>Checking Arc Testnet for your USDC deposit.</p>
+        <h2 className="display text-xl font-bold mb-2" style={{ color: 'white', letterSpacing: '-0.02em' }}>Scanning blockchain...</h2>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>Checking Arc Testnet for your USDC deposit.</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col min-h-full px-5 pb-8">
-      <p className="text-sm mb-5" style={{ color: 'var(--subtle)' }}>
+      <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.60)' }}>
         Send USDC to your Cashland wallet on Arc Testnet. Balance updates automatically on arrival.
       </p>
 
       {/* Wallet card */}
-      <div className="rounded-2xl p-5 mb-4" style={glass.card}>
+      <div className="rounded-2xl p-5 mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'var(--brand-light)' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,168,107,0.15)' }}>
             <Wallet size={20} style={{ color: 'var(--brand)' }} />
           </div>
           <div>
-            <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Your Cashland wallet</p>
+            <p className="text-sm font-semibold" style={{ color: 'white' }}>Your Cashland wallet</p>
             {isConnected
               ? <p className="text-xs" style={{ color: 'var(--brand)' }}>Connected</p>
-              : <p className="text-xs" style={{ color: 'var(--muted)' }}>Connect wallet to see live address</p>
+              : <p className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>Connect wallet to see live address</p>
             }
           </div>
         </div>
-        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-3" style={{ background: 'rgba(0,0,0,0.04)' }}>
-          <span className="text-sm mono flex-1 text-center" style={{ color: 'var(--ink)' }}>{short}</span>
-          <button onClick={handleCopy} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'var(--brand-light)' }}>
+        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-3" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <span className="text-sm mono flex-1 text-center" style={{ color: 'white' }}>{short}</span>
+          <button onClick={handleCopy} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,168,107,0.15)' }}>
             {copied ? <Check size={13} style={{ color: 'var(--brand)' }} /> : <Copy size={13} style={{ color: 'var(--brand)' }} />}
           </button>
         </div>
         {/* Simple QR placeholder */}
         <div className="flex justify-center">
-          <div className="w-36 h-36 rounded-2xl flex items-center justify-center" style={{ background: 'white', border: '2px solid rgba(0,168,107,0.12)' }}>
+          <div className="w-36 h-36 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)', border: '2px solid rgba(0,168,107,0.12)' }}>
             <svg width="110" height="110" viewBox="0 0 110 110" fill="none">
               <rect x="6" y="6" width="28" height="28" rx="3" fill="#00A86B"/>
               <rect x="12" y="12" width="16" height="16" rx="1" fill="white"/>
@@ -686,7 +686,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
       </div>
 
       {/* Info table */}
-      <div className="rounded-2xl overflow-hidden mb-4" style={glass.card}>
+      <div className="rounded-2xl overflow-hidden mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
         {[
           { label: 'Network', value: 'Arc Testnet' },
           { label: 'Asset', value: 'USDC' },
@@ -696,10 +696,10 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
         ].map((row, i, arr) => (
           <div key={row.label}>
             <div className="flex justify-between items-center px-4 py-3">
-              <span className="text-sm" style={{ color: 'var(--subtle)' }}>{row.label}</span>
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>{row.label}</span>
               <span className="text-sm font-semibold" style={{ color: (row as { success?: boolean }).success ? 'var(--brand)' : 'var(--ink)' }}>{row.value}</span>
             </div>
-            {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(0,0,0,0.05)' }} />}
+            {i < arr.length - 1 && <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />}
           </div>
         ))}
       </div>
@@ -724,7 +724,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
           target="_blank"
           rel="noreferrer"
           className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-          style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}
+          style={{ background: 'rgba(0,168,107,0.15)', color: 'var(--brand)' }}
         >
           <ExternalLink size={15} /> Get testnet USDC from faucet
         </a>
@@ -774,7 +774,7 @@ export default function AddMoneyScreen({ onClose, onDeposited }: Props) {
     },
   ];
 
-  const wrapperStyle = { background: 'linear-gradient(180deg, #F4FAF7 0%, #EDFAF4 100%)' };
+  const wrapperStyle = { background: 'linear-gradient(180deg, #080f1a 0%, #0a1628 50%, #0c1c32 100%)' };
 
   if (screen === 'bank') return (
     <div className="fixed inset-0 z-50 flex flex-col" style={wrapperStyle}>
@@ -826,30 +826,30 @@ export default function AddMoneyScreen({ onClose, onDeposited }: Props) {
                 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                 onClick={() => setScreen(m.id)}
                 className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-left transition-all active:scale-[0.98]"
-                style={{ ...glass.card, border: '1px solid rgba(0,0,0,0.06)' }}
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}
               >
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: m.iconBg }}>
                   {m.icon}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <p className="text-base font-semibold" style={{ color: 'var(--ink)' }}>{m.title}</p>
+                    <p className="text-base font-semibold" style={{ color: 'white' }}>{m.title}</p>
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
                       style={{ background: m.badgeBg, color: m.badgeColor }}>
                       {m.badge}
                     </span>
                   </div>
-                  <p className="text-sm" style={{ color: 'var(--subtle)' }}>{m.subtitle}</p>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>{m.subtitle}</p>
                 </div>
-                <ChevronLeft size={18} style={{ color: 'var(--muted)', transform: 'rotate(180deg)', flexShrink: 0 }} />
+                <ChevronLeft size={18} style={{ color: 'rgba(255,255,255,0.50)', transform: 'rotate(180deg)', flexShrink: 0 }} />
               </motion.button>
             ))}
           </AnimatePresence>
         </div>
 
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl mt-6" style={{ background: 'var(--brand-light)' }}>
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl mt-6" style={{ background: 'rgba(0,168,107,0.15)' }}>
           <ShieldCheck size={14} style={{ color: 'var(--brand)' }} />
-          <p className="text-xs font-medium" style={{ color: 'var(--subtle)' }}>
+          <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.60)' }}>
             All top-ups are secured by Cashland. Zero fees on every method.
           </p>
         </div>
