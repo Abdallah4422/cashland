@@ -37,14 +37,10 @@ export default function SplashScreen({ onDone }: Props) {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <div
-            className="w-20 h-20 rounded-3xl flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.22)', border: '1.5px solid rgba(255,255,255,0.40)', boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}
+            className="w-24 h-24 rounded-3xl overflow-hidden flex items-center justify-center"
+            style={{ background: '#0a1628', border: '1.5px solid rgba(0,168,107,0.35)', boxShadow: '0 0 40px rgba(0,168,107,0.25), 0 8px 32px rgba(0,0,0,0.4)' }}
           >
-            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-              <path d="M22 6C13.16 6 6 13.16 6 22C6 30.84 13.16 38 22 38C30.84 38 38 30.84 38 22C38 13.16 30.84 6 22 6Z" fill="rgba(255,255,255,0.95)"/>
-              <path d="M27.5 16.5H19C17.9 16.5 17 17.4 17 18.5V19.5C17 20.6 17.9 21.5 19 21.5H25C26.1 21.5 27 22.4 27 23.5V25.5C27 26.6 26.1 27.5 25 27.5H16.5" stroke="#00A86B" strokeWidth="2.2" strokeLinecap="round"/>
-              <path d="M22 14V16.5M22 27.5V30" stroke="#00A86B" strokeWidth="2.2" strokeLinecap="round"/>
-            </svg>
+            <img src="/brand/cashland-icon.svg" alt="Cashland" width="96" height="96" style={{ display: 'block' }} />
           </div>
         </motion.div>
 

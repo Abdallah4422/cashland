@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" fill="none">
+  <!--
+    Cashland wordmark — white, for dark navy backgrounds.
+    Typeface: geometric sans constructed with SVG paths.
+    The "C" in Cash uses the same coin-arc motif as the icon.
+    Letter spacing: tight modern fintech style.
+  -->
+
+  <!-- C — coin arc motif, slightly wider -->
+  <path d="M10 18 C10 10 18 4 30 4 C42 4 50 10 52 18" stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M10 54 C10 62 18 68 30 68 C42 68 50 62 52 54" stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <line x1="10" y1="36" x2="10" y2="18" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <line x1="10" y1="36" x2="10" y2="54" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <!-- Strike lines on C -->
+  <line x1="22" y1="31" x2="46" y2="31" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <line x1="22" y1="41" x2="46" y2="41" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- a -->
+  <path d="M62 30 C62 24 68 22 74 22 C80 22 86 24 86 32 L86 58 C84 62 80 68 74 68 C68 68 62 64 62 58 C62 52 68 48 78 48 L86 48" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- s -->
+  <path d="M104 28 C104 24 108 22 114 22 C120 22 126 24 126 30 C126 36 118 38 114 40 C110 42 102 44 102 52 C102 58 108 62 116 62 C122 62 128 60 128 56" stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+
+  <!-- h -->
+  <line x1="138" y1="4" x2="138" y2="68" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M138 38 C142 28 150 22 158 22 C166 22 168 28 168 36 L168 68" stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+
+  <!-- separator dot — subtle accent -->
+  <circle cx="182" cy="36" r="3" fill="#00A86B"/>
+
+  <!-- L -->
+  <line x1="192" y1="4" x2="192" y2="68" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="192" y1="68" x2="220" y2="68" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- a -->
+  <path d="M228 30 C228 24 234 22 240 22 C246 22 252 24 252 32 L252 58 C250 62 246 68 240 68 C234 68 228 64 228 58 C228 52 234 48 244 48 L252 48" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- n -->
+  <line x1="262" y1="22" x2="262" y2="68" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M262 36 C266 26 274 22 282 22 C290 22 292 28 292 36 L292 68" stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+
+  <!-- d -->
+  <line x1="316" y1="4" x2="316" y2="68" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M316 28 C312 22 306 20 300 22 C294 24 290 30 290 44 C290 58 294 66 300 68 C306 70 312 66 316 60" stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+</svg>

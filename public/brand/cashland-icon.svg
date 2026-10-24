@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- App icon: rounded square badge with coin-C mark -->
+
+  <!-- Badge background: deep navy for context (transparent in production) -->
+  <!-- Use on dark navy: set background="transparent" -->
+
+  <!-- Outer badge shape -->
+  <rect width="120" height="120" rx="28" fill="#0a1628"/>
+
+  <!-- Subtle green ambient glow layer -->
+  <rect width="120" height="120" rx="28" fill="url(#iconGlow)" opacity="0.18"/>
+
+  <!-- Stack shadow coins (depth / cash feel) -->
+  <ellipse cx="60" cy="88" rx="26" ry="5" fill="white" opacity="0.10"/>
+  <ellipse cx="60" cy="83" rx="26" ry="5" fill="white" opacity="0.13"/>
+
+  <!-- Main coin circle -->
+  <circle cx="60" cy="58" r="30" fill="none" stroke="white" stroke-width="5.5"/>
+
+  <!-- Inner coin fill ring -->
+  <circle cx="60" cy="58" r="23" fill="white" opacity="0.08"/>
+
+  <!-- Currency C mark — bold arc cut to look like ₦/$ hybrid -->
+  <!-- Top arc of C -->
+  <path d="M76 46 C72 38 52 36 44 46" stroke="white" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <!-- Bottom arc of C -->
+  <path d="M76 70 C72 78 52 80 44 70" stroke="white" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Two horizontal strike lines (currency symbol feel) -->
+  <line x1="52" y1="53" x2="70" y2="53" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="52" y1="63" x2="70" y2="63" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Top serif tick on coin rim -->
+  <line x1="60" y1="28" x2="60" y2="33" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+  <defs>
+    <radialGradient id="iconGlow" cx="30%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#00A86B"/>
+      <stop offset="100%" stop-color="#0a1628"/>
+    </radialGradient>
+  </defs>
+</svg>
