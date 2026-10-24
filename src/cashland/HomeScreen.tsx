@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Eye, EyeOff, Plus, ArrowUpRight, ArrowDownLeft, Building2,
   RefreshCw, Smartphone, ChevronRight, CheckCircle2, Copy,
-  TrendingDown, TrendingUp,
 } from 'lucide-react';
 import { ConnectKitButton } from 'connectkit';
 import { formatNaira, contacts } from './design';
@@ -64,7 +63,7 @@ interface CircleActionProps {
 
 function CircleAction({ label, icon: Icon, onClick, color, bg, glow, primary }: CircleActionProps) {
   const [pressed, setPressed] = useState(false);
-  const size = primary ? 64 : 56;
+  const size = primary ? 52 : 46;
 
   return (
     <button
@@ -98,7 +97,7 @@ function CircleAction({ label, icon: Icon, onClick, color, bg, glow, primary }: 
           transition={{ duration: 0.13, ease: 'easeOut' }}
         >
           <Icon
-            size={primary ? 26 : 22}
+            size={primary ? 20 : 18}
             style={{
               color: primary ? 'white' : color,
               strokeWidth: 2.3,
@@ -137,10 +136,6 @@ export default function HomeScreen({
     : isConnected ? formatUsdcAs(usdcFloat, currency, rates) : null;
 
   const zeroBalance = currency === 'NGN' ? '₦0.00' : currency === 'USD' ? '$0.00' : '£0.00';
-
-  // Mocked "today" stats — will come from backend
-  const spentToday = 5000;
-  const receivedToday = 12500;
 
   function fmtAmount(ngnAmount: number): string {
     if (currency === 'NGN') return formatNaira(ngnAmount);
@@ -198,35 +193,33 @@ export default function HomeScreen({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Earn badge — from left-app reference */}
-            <button
-              onClick={onInvite}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold text-xs transition-all active:scale-95"
-              style={{ background: 'linear-gradient(135deg, #1e3a5f, #1a3254)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.12)' }}
-            >
-              <TrendingUp size={12} style={{ color: '#00c47d' }} />
-              Earn ₦500
-            </button>
             <NotificationBell onClick={onOpenNotifications} white />
           </div>
         </div>
 
         {/* ── Open balance (not inside a card box) ── */}
         <div className="relative mb-5">
-          <div className="flex items-center gap-2 mb-1">
-            <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.38)', letterSpacing: '0.12em' }}>
-              Total Balance
-            </p>
-            <button onClick={() => setBalanceVisible(v => !v)} className="active:scale-90 transition-transform">
-              {balanceVisible
-                ? <Eye size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-                : <EyeOff size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />}
-            </button>
-            {isConnected && (
-              <button onClick={() => { void refetch(); }} className="active:scale-90 transition-transform">
-                <RefreshCw size={11} style={{ color: 'rgba(255,255,255,0.28)' }} className={isLoading ? 'animate-spin' : ''} />
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.38)', letterSpacing: '0.12em' }}>
+                Total Balance
+              </p>
+              <button onClick={() => setBalanceVisible(v => !v)} className="active:scale-90 transition-transform">
+                {balanceVisible
+                  ? <Eye size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
+                  : <EyeOff size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />}
               </button>
-            )}
+              {isConnected && (
+                <button onClick={() => { void refetch(); }} className="active:scale-90 transition-transform">
+                  <RefreshCw size={11} style={{ color: 'rgba(255,255,255,0.28)' }} className={isLoading ? 'animate-spin' : ''} />
+                </button>
+              )}
+            </div>
+            <button onClick={refresh} className="active:opacity-60 transition-opacity">
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                {isRefreshing ? 'Updating...' : `$1 = ₦${rates.NGN.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`}
+              </span>
+            </button>
           </div>
 
           <AnimatePresence mode="wait">
@@ -240,8 +233,8 @@ export default function HomeScreen({
               {/* Balance number — tappable to cycle currency */}
               <button onClick={cycleCurrency} className="flex items-baseline gap-2 mb-2 active:opacity-80 transition-opacity">
                 <span
-                  className="font-bold tabular"
-                  style={{ color: 'white', fontSize: 44, letterSpacing: '-0.04em', lineHeight: 1.05 }}
+                  className="tabular"
+                  style={{ color: 'white', fontSize: 44, fontWeight: 500, letterSpacing: '-0.04em', lineHeight: 1.05 }}
                 >
                   {isLoading && isConnected
                     ? <span style={{ fontSize: 28, color: 'rgba(255,255,255,0.35)' }}>Loading...</span>
@@ -259,29 +252,7 @@ export default function HomeScreen({
                 </span>
               </button>
 
-              {/* Today stats row — like OPay's "Earned Today" */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  <TrendingDown size={12} style={{ color: '#f87171' }} />
-                  <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                    Spent today: <span style={{ color: '#f87171' }}>{formatNaira(spentToday)}</span>
-                  </span>
-                </div>
-                <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
-                <div className="flex items-center gap-1.5">
-                  <TrendingUp size={12} style={{ color: '#00c47d' }} />
-                  <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                    In: <span style={{ color: '#00c47d' }}>{formatNaira(receivedToday)}</span>
-                  </span>
-                </div>
-                <button
-                  onClick={refresh}
-                  className="ml-auto text-[10px] font-medium active:opacity-60"
-                  style={{ color: 'rgba(255,255,255,0.25)' }}
-                >
-                  {isRefreshing ? 'Updating...' : `$1 = ₦${rates.NGN.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`}
-                </button>
-              </div>
+
             </motion.div>
           </AnimatePresence>
         </div>
