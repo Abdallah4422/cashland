@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Smartphone, ShieldCheck, Wallet } from 'lucide-react';
-import { glass, brandGradient } from './design';
+import { brandGradient } from './design';
 
 interface Props {
   onGetStarted: () => void;
@@ -69,7 +69,13 @@ export default function OnboardingScreen({ onGetStarted, onLogin }: Props) {
             exit={{ opacity: 0, x: -60 }}
             transition={{ type: 'spring', stiffness: 300, damping: 32 }}
           >
-            <div className="rounded-3xl p-8" style={glass.card}>
+            <div className="rounded-3xl p-8" style={{
+              background: 'rgba(255,255,255,0.06)',
+              backdropFilter: 'blur(24px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.30)',
+            }}>
               {/* Spectral strip */}
               <div className="h-1 rounded-full mb-8" style={{ background: `linear-gradient(90deg, ${card.color}, ${card.color}88)` }} />
 
@@ -80,10 +86,10 @@ export default function OnboardingScreen({ onGetStarted, onLogin }: Props) {
                 <Icon size={30} style={{ color: card.color }} />
               </div>
 
-              <h2 className="display text-2xl font-bold mb-3 text-balance" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>
+              <h2 className="display text-2xl font-bold mb-3 text-balance" style={{ color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.02em' }}>
                 {card.title}
               </h2>
-              <p className="text-base leading-relaxed text-pretty" style={{ color: 'var(--subtle)' }}>
+              <p className="text-base leading-relaxed text-pretty" style={{ color: 'rgba(255,255,255,0.60)' }}>
                 {card.description}
               </p>
             </div>
