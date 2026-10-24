@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, Plus, ArrowUpRight, ArrowDownLeft, Building2, CheckCircle2, ChevronRight, ShieldCheck, Wallet, RefreshCw, Smartphone, UserPlus, TrendingUp } from 'lucide-react';
 import { ConnectKitButton } from 'connectkit';
-import { glass, navyGradient, formatNaira, contacts } from './design';
+import { formatNaira, contacts } from './design';
 import { useUsdcBalance } from './useUsdcBalance';
 import { NotificationBell } from './NotificationDrawer';
 import CurrencyToggle from './CurrencyToggle';
@@ -43,6 +43,90 @@ export { Avatar };
 function getGreeting(): string {
   const h = new Date().getHours();
   return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+}
+
+// ── Neon action button ────────────────────────────────────────────────────────
+interface NeonActionButtonProps {
+  label: string;
+  icon: React.ElementType;
+  onClick: () => void;
+  color: string;
+  bg: string;
+  glow: string;
+}
+
+function NeonActionButton({ label, icon: Icon, onClick, color, bg, glow }: NeonActionButtonProps) {
+  const [pressed, setPressed] = useState(false);
+
+  return (
+    <button
+      onClick={onClick}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      className="flex flex-col items-center gap-2 transition-none"
+    >
+      <div className="relative">
+        {/* Outer pulse ring — animates on press */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl"
+          style={{ border: `2px solid ${color}` }}
+          initial={{ opacity: 0, scale: 1 }}
+          animate={pressed
+            ? { opacity: [0.7, 0], scale: [1, 1.55], transition: { duration: 0.55, ease: 'easeOut' } }
+            : { opacity: 0, scale: 1 }
+          }
+        />
+        {/* Second ring, staggered */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl"
+          style={{ border: `1.5px solid ${color}80` }}
+          initial={{ opacity: 0, scale: 1 }}
+          animate={pressed
+            ? { opacity: [0.5, 0], scale: [1, 1.85], transition: { duration: 0.7, ease: 'easeOut', delay: 0.08 } }
+            : { opacity: 0, scale: 1 }
+          }
+        />
+        {/* Icon container */}
+        <motion.div
+          className="w-[60px] h-[60px] rounded-2xl flex items-center justify-center relative overflow-hidden"
+          style={{
+            background: bg,
+            border: `1.5px solid ${color}40`,
+          }}
+          animate={pressed
+            ? { boxShadow: `0 0 0 3px ${color}30, 0 8px 28px ${glow}`, scale: 0.92 }
+            : { boxShadow: `0 4px 22px ${glow}, 0 1px 0 rgba(255,255,255,0.06) inset`, scale: 1 }
+          }
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+        >
+          {/* Inner glow bloom */}
+          <div
+            className="absolute inset-0 rounded-2xl pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at 50% 30%, ${color}30 0%, transparent 70%)`,
+            }}
+          />
+          <Icon
+            size={24}
+            style={{
+              color,
+              strokeWidth: 2.2,
+              filter: `drop-shadow(0 0 6px ${color}cc)`,
+              position: 'relative',
+              zIndex: 1,
+            }}
+          />
+        </motion.div>
+      </div>
+      <span
+        className="text-xs font-semibold text-center leading-tight"
+        style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11 }}
+      >
+        {label}
+      </span>
+    </button>
+  );
 }
 
 export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, onBills, onInvite, onOpenNotifications, liveBalance, userName }: Props) {
@@ -227,19 +311,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
       <div className="px-5 -mt-1 mb-5">
         <div className="grid grid-cols-4 gap-3 pt-5">
           {quickActions.map(({ label, icon: Icon, onClick, color, bg, glow }) => (
-            <button key={label} onClick={onClick} className="flex flex-col items-center gap-2 transition-all active:scale-90">
-              <div
-                className="w-[58px] h-[58px] rounded-2xl flex items-center justify-center"
-                style={{
-                  background: bg,
-                  boxShadow: `0 4px 20px ${glow}, 0 1px 0 rgba(255,255,255,0.06) inset`,
-                  border: `1px solid ${color}28`,
-                }}
-              >
-                <Icon size={22} style={{ color, strokeWidth: 2 }} />
-              </div>
-              <span className="text-xs font-semibold text-center leading-tight" style={{ color: 'var(--ink)', fontSize: 11 }}>{label}</span>
-            </button>
+            <NeonActionButton key={label} label={label} icon={Icon} onClick={onClick} color={color} bg={bg} glow={glow} />
           ))}
         </div>
       </div>
@@ -269,15 +341,30 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
       <div className="px-5 mb-5">
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: 'Pay Bills', icon: Smartphone, onClick: onBills, color: '#fbbf24', bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.2)' },
-            { label: 'Invite & Earn', icon: UserPlus, onClick: onInvite, color: '#818cf8', bg: 'rgba(129,140,248,0.12)', border: 'rgba(129,140,248,0.2)' },
-          ].map(({ label, icon: Icon, onClick, color, bg, border }) => (
-            <button key={label} onClick={onClick} className="flex items-center gap-2.5 px-3.5 py-3.5 rounded-2xl transition-all active:scale-95" style={{ background: bg, border: `1px solid ${border}` }}>
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${color}20` }}>
-                <Icon size={16} style={{ color }} />
-              </div>
-              <span className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>{label}</span>
-            </button>
+            { label: 'Pay Bills', icon: Smartphone, onClick: onBills, color: '#fbbf24', glow: 'rgba(251,191,36,0.35)' },
+            { label: 'Invite & Earn', icon: UserPlus, onClick: onInvite, color: '#818cf8', glow: 'rgba(129,140,248,0.35)' },
+          ].map(({ label, icon: Icon, onClick, color, glow }) => (
+            <motion.button
+              key={label}
+              onClick={onClick}
+              whileTap={{ scale: 0.94 }}
+              className="flex items-center gap-2.5 px-3.5 py-3.5 rounded-2xl"
+              style={{
+                background: `${color}14`,
+                border: `1px solid ${color}30`,
+                boxShadow: `0 0 0 0px ${color}00`,
+              }}
+              whileHover={{ boxShadow: `0 0 18px ${glow}` }}
+            >
+              <motion.div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${color}22` }}
+                whileTap={{ boxShadow: `0 0 14px ${glow}` }}
+              >
+                <Icon size={18} style={{ color, filter: `drop-shadow(0 0 5px ${color}aa)` }} />
+              </motion.div>
+              <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.90)' }}>{label}</span>
+            </motion.button>
           ))}
         </div>
       </div>
