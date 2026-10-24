@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Eye, EyeOff, Plus, ArrowUpRight, ArrowDownLeft, Building2,
-  RefreshCw, Smartphone, ChevronRight, CheckCircle2, Copy,
+  RefreshCw, Smartphone, ChevronRight, CheckCircle2, Copy, Bell,
 } from 'lucide-react';
 import { ConnectKitButton } from 'connectkit';
 import { formatNaira, contacts } from './design';
@@ -50,7 +50,6 @@ function getGreeting(): string {
   return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
 }
 
-// ── Circle action button (OPay-inspired) ─────────────────────────────────────
 interface CircleActionProps {
   label: string;
   icon: React.ElementType;
@@ -74,41 +73,42 @@ function CircleAction({ label, icon: Icon, onClick, color, bg, glow, primary }: 
       className="flex flex-col items-center gap-2 flex-shrink-0"
     >
       <div className="relative flex items-center justify-center">
-        {/* Pulse ring on press */}
         <motion.div
           className="absolute rounded-full"
-          style={{ width: size, height: size, border: `2px solid ${color}` }}
-          initial={{ opacity: 0, scale: 1 }}
+          style={{ width: size + 16, height: size + 16, border: `1.5px solid ${color}` }}
+          initial={{ opacity: 0, scale: 0.85 }}
           animate={pressed
-            ? { opacity: [0.8, 0], scale: [1, 1.7], transition: { duration: 0.45, ease: 'easeOut' } }
-            : { opacity: 0, scale: 1 }}
+            ? { opacity: [0.7, 0], scale: [0.9, 1.6], transition: { duration: 0.4, ease: 'easeOut' } }
+            : { opacity: 0, scale: 0.85 }}
         />
         <motion.div
           className="rounded-full flex items-center justify-center"
           style={{
-            width: size,
-            height: size,
-            background: primary ? color : bg,
+            width: size, height: size,
+            background: primary
+              ? `linear-gradient(135deg, ${color}, ${color}cc)`
+              : bg,
             boxShadow: primary
-              ? `0 6px 24px ${glow}, 0 0 0 3px ${color}20`
-              : `0 4px 16px ${glow}`,
+              ? `0 8px 28px ${glow}, 0 0 0 3px ${color}22, inset 0 1px 0 rgba(255,255,255,0.25)`
+              : `0 4px 16px ${glow}, inset 0 1px 0 rgba(255,255,255,0.08)`,
+            border: primary ? 'none' : `1px solid ${color}30`,
           }}
-          animate={pressed ? { scale: 0.91 } : { scale: 1 }}
-          transition={{ duration: 0.13, ease: 'easeOut' }}
+          animate={pressed ? { scale: 0.89 } : { scale: 1 }}
+          transition={{ duration: 0.12, ease: 'easeOut' }}
         >
           <Icon
             size={primary ? 20 : 18}
             style={{
               color: primary ? 'white' : color,
-              strokeWidth: 2.3,
-              filter: primary ? 'none' : `drop-shadow(0 0 4px ${color}99)`,
+              strokeWidth: 2.2,
+              filter: `drop-shadow(0 0 ${primary ? 6 : 4}px ${color}${primary ? 'bb' : '88'})`,
             }}
           />
         </motion.div>
       </div>
       <span
         className="text-[11px] font-semibold text-center leading-tight"
-        style={{ color: primary ? 'white' : 'rgba(255,255,255,0.75)' }}
+        style={{ color: primary ? 'white' : 'rgba(255,255,255,0.7)' }}
       >
         {label}
       </span>
@@ -116,7 +116,6 @@ function CircleAction({ label, icon: Icon, onClick, color, bg, glow, primary }: 
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
 export default function HomeScreen({
   onSend, onReceive, onAddMoney, onWithdraw, onBills, onInvite, onOpenNotifications, liveBalance, userName,
 }: Props) {
@@ -153,7 +152,6 @@ export default function HomeScreen({
     });
   }
 
-  // Currency cycle on tap
   const currencies: Currency[] = ['NGN', 'USD', 'GBP'];
   function cycleCurrency() {
     setCurrency(c => {
@@ -163,221 +161,291 @@ export default function HomeScreen({
   }
 
   return (
-    <div className="pb-28 min-h-screen" style={{ background: '#080f1a' }}>
+    <div className="pb-28 min-h-screen" style={{ background: '#060d18' }}>
 
-      {/* ── Hero header ───────────────────────────────────────────────────── */}
+      {/* ── Sticky top bar ─────────────────────────────────────────────────── */}
       <div
-        className="relative px-5 pt-14 pb-8"
-        style={{ background: 'linear-gradient(175deg, #0d2040 0%, #080f1a 100%)' }}
+        className="sticky top-0 z-20 flex items-center justify-between px-5 pt-12 pb-3"
+        style={{ background: 'linear-gradient(180deg, #060d18 60%, transparent 100%)' }}
       >
-        {/* Ambient glows */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div style={{ position: 'absolute', top: -60, right: -20, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,196,125,0.08) 0%, transparent 70%)', filter: 'blur(50px)' }} />
-          <div style={{ position: 'absolute', top: 60, left: -50, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,140,248,0.07) 0%, transparent 70%)', filter: 'blur(50px)' }} />
-        </div>
-
-        {/* Top row */}
-        <div className="relative flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #00c47d, #00a86b)', color: 'white', boxShadow: '0 2px 14px rgba(0,196,125,0.45)' }}
-            >
-              {(userName ?? 'Musa Ibrahim').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
-            </div>
-            <div>
-              <p className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>{greeting}</p>
-              <h1 className="text-[17px] font-bold text-white" style={{ letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                {(userName ?? 'Musa Ibrahim').split(' ')[0]}
-              </h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <NotificationBell onClick={onOpenNotifications} white />
-          </div>
-        </div>
-
-        {/* ── Open balance (not inside a card box) ── */}
-        <div className="relative mb-5">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.38)', letterSpacing: '0.12em' }}>
-                Total Balance
-              </p>
-              <button onClick={() => setBalanceVisible(v => !v)} className="active:scale-90 transition-transform">
-                {balanceVisible
-                  ? <Eye size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-                  : <EyeOff size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />}
-              </button>
-              {isConnected && (
-                <button onClick={() => { void refetch(); }} className="active:scale-90 transition-transform">
-                  <RefreshCw size={11} style={{ color: 'rgba(255,255,255,0.28)' }} className={isLoading ? 'animate-spin' : ''} />
-                </button>
-              )}
-            </div>
-            <button onClick={refresh} className="active:opacity-60 transition-opacity">
-              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.28)' }}>
-                {isRefreshing ? 'Updating...' : `$1 = ₦${rates.NGN.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`}
-              </span>
-            </button>
-          </div>
-
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${currency}-${usdcFloat}-${isLoading}`}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.16 }}
-            >
-              {/* Balance number — tappable to cycle currency */}
-              <button onClick={cycleCurrency} className="flex items-baseline gap-2 mb-2 active:opacity-80 transition-opacity">
-                <span
-                  className="tabular"
-                  style={{ color: 'white', fontSize: 44, fontWeight: 500, letterSpacing: '-0.04em', lineHeight: 1.05 }}
-                >
-                  {isLoading && isConnected
-                    ? <span style={{ fontSize: 28, color: 'rgba(255,255,255,0.35)' }}>Loading...</span>
-                    : !balanceVisible
-                      ? <span style={{ fontSize: 36, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em' }}>••••••</span>
-                      : primaryBalance ?? zeroBalance
-                  }
-                </span>
-                {/* Currency badge */}
-                <span
-                  className="text-[11px] font-bold px-1.5 py-0.5 rounded-md mb-1"
-                  style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.55)' }}
-                >
-                  {currency}
-                </span>
-              </button>
-
-
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* ── Account number / CashTag strip ── */}
-        <div
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-        >
+        <div className="flex items-center gap-2.5">
           <div
-            className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(0,196,125,0.15)' }}
+            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, #00c47d, #00956a)',
+              color: 'white',
+              boxShadow: '0 2px 12px rgba(0,196,125,0.5)',
+            }}
           >
-            <span className="text-[10px] font-black" style={{ color: '#00c47d' }}>₦</span>
+            {(userName ?? 'Musa Ibrahim').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
           </div>
-          <div className="flex-1 min-w-0">
-            <span className="text-xs font-semibold text-white mr-2">@musaibrahim</span>
-            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>· 2181985733</span>
+          <div>
+            <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.38)' }}>{greeting}</p>
+            <p className="text-[15px] font-bold text-white leading-none" style={{ letterSpacing: '-0.02em' }}>
+              {(userName ?? 'Musa Ibrahim').split(' ')[0]}
+            </p>
           </div>
-          <button
-            onClick={copyTag}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-xl active:scale-95 transition-all"
-            style={{ background: copied ? 'rgba(0,196,125,0.2)' : 'rgba(255,255,255,0.07)' }}
-          >
-            <Copy size={11} style={{ color: copied ? '#00c47d' : 'rgba(255,255,255,0.45)' }} />
-            <span className="text-[10px] font-semibold" style={{ color: copied ? '#00c47d' : 'rgba(255,255,255,0.45)' }}>
-              {copied ? 'Copied' : 'Copy'}
-            </span>
-          </button>
+        </div>
+        <NotificationBell onClick={onOpenNotifications} white />
+      </div>
 
-          {!isConnected && (
-            <ConnectKitButton.Custom>
-              {({ show }) => (
-                <button
-                  onClick={show}
-                  className="ml-1 flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-semibold active:scale-95"
-                  style={{ background: 'rgba(0,196,125,0.18)', color: '#00c47d', border: '1px solid rgba(0,196,125,0.28)' }}
-                >
-                  Link
+      {/* ── HERO BALANCE CARD ──────────────────────────────────────────────── */}
+      <div className="px-5 pt-2 pb-1">
+        <div
+          className="relative rounded-3xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #0b3d2e 0%, #0d3a5c 40%, #0b2a48 70%, #092038 100%)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06)',
+            minHeight: 200,
+          }}
+        >
+          {/* Mesh glow layers */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div style={{
+              position: 'absolute', top: -40, right: -30, width: 220, height: 220,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(0,196,125,0.22) 0%, transparent 65%)',
+              filter: 'blur(30px)',
+            }} />
+            <div style={{
+              position: 'absolute', bottom: -30, left: -20, width: 180, height: 180,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(56,189,248,0.18) 0%, transparent 65%)',
+              filter: 'blur(35px)',
+            }} />
+            <div style={{
+              position: 'absolute', top: '40%', left: '30%', width: 160, height: 160,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(129,140,248,0.1) 0%, transparent 65%)',
+              filter: 'blur(40px)',
+            }} />
+            {/* Fine grid overlay */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }} />
+            {/* Shimmer line */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)',
+            }} />
+          </div>
+
+          {/* Card content */}
+          <div className="relative px-5 pt-5 pb-5">
+            {/* Label row */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.14em' }}>
+                  Total Balance
+                </span>
+                <button onClick={() => setBalanceVisible(v => !v)} className="active:scale-90 transition-transform">
+                  {balanceVisible
+                    ? <Eye size={13} style={{ color: 'rgba(255,255,255,0.35)' }} />
+                    : <EyeOff size={13} style={{ color: 'rgba(255,255,255,0.35)' }} />}
                 </button>
+                {isConnected && (
+                  <button onClick={() => { void refetch(); }} className="active:scale-90 transition-transform">
+                    <RefreshCw size={11} style={{ color: 'rgba(255,255,255,0.28)' }} className={isLoading ? 'animate-spin' : ''} />
+                  </button>
+                )}
+              </div>
+              <button onClick={refresh} className="active:opacity-60 transition-opacity">
+                <span className="text-[10px] font-medium px-2 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.4)' }}>
+                  {isRefreshing ? 'Updating...' : `$1 = ₦${rates.NGN.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`}
+                </span>
+              </button>
+            </div>
+
+            {/* Balance number */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${currency}-${usdcFloat}-${isLoading}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18 }}
+              >
+                <button onClick={cycleCurrency} className="flex items-end gap-2.5 mb-1 active:opacity-80 transition-opacity">
+                  <span style={{
+                    color: 'white',
+                    fontSize: 46,
+                    fontWeight: 600,
+                    letterSpacing: '-0.045em',
+                    lineHeight: 1,
+                    textShadow: '0 2px 20px rgba(0,196,125,0.3)',
+                  }}>
+                    {isLoading && isConnected
+                      ? <span style={{ fontSize: 26, color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>Loading...</span>
+                      : !balanceVisible
+                        ? <span style={{ fontSize: 34, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em', fontWeight: 400 }}>••••••</span>
+                        : primaryBalance ?? zeroBalance}
+                  </span>
+                  <span
+                    className="text-[11px] font-bold px-2 py-1 rounded-lg mb-1.5"
+                    style={{
+                      background: 'rgba(0,196,125,0.18)',
+                      color: '#00c47d',
+                      border: '1px solid rgba(0,196,125,0.25)',
+                    }}
+                  >
+                    {currency}
+                  </span>
+                </button>
+                <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>
+                  Add money to get started
+                </p>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Divider */}
+            <div className="my-4" style={{ height: 1, background: 'rgba(255,255,255,0.07)' }} />
+
+            {/* Account strip inside card */}
+            <div className="flex items-center gap-2">
+              <div
+                className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(0,196,125,0.18)' }}
+              >
+                <span className="text-[10px] font-black" style={{ color: '#00c47d' }}>₦</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="text-[12px] font-semibold text-white mr-1.5">@musaibrahim</span>
+                <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.32)' }}>· 2181985733</span>
+              </div>
+              <button
+                onClick={copyTag}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl active:scale-95 transition-all"
+                style={{
+                  background: copied ? 'rgba(0,196,125,0.22)' : 'rgba(255,255,255,0.08)',
+                  border: copied ? '1px solid rgba(0,196,125,0.35)' : '1px solid rgba(255,255,255,0.1)',
+                }}
+              >
+                <Copy size={11} style={{ color: copied ? '#00c47d' : 'rgba(255,255,255,0.5)' }} />
+                <span className="text-[10px] font-semibold" style={{ color: copied ? '#00c47d' : 'rgba(255,255,255,0.5)' }}>
+                  {copied ? 'Copied' : 'Copy'}
+                </span>
+              </button>
+              {!isConnected && (
+                <ConnectKitButton.Custom>
+                  {({ show }) => (
+                    <button
+                      onClick={show}
+                      className="ml-1 px-2.5 py-1.5 rounded-xl text-[10px] font-semibold active:scale-95"
+                      style={{ background: 'rgba(0,196,125,0.18)', color: '#00c47d', border: '1px solid rgba(0,196,125,0.3)' }}
+                    >
+                      Link
+                    </button>
+                  )}
+                </ConnectKitButton.Custom>
               )}
-            </ConnectKitButton.Custom>
-          )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* ── Live ticker ───────────────────────────────────────────────────── */}
       <SocialFeedTicker />
 
-      {/* ── Quick actions (circle style) ──────────────────────────────────── */}
-      <div className="px-5 pt-6 pb-2">
-        <div className="flex items-start justify-between">
-          {/* Add Money — primary filled green */}
-          <CircleAction
-            label="Add Money"
-            icon={Plus}
-            onClick={onAddMoney}
-            color="#00c47d"
-            bg="rgba(0,196,125,0.15)"
-            glow="rgba(0,196,125,0.4)"
-            primary
-          />
-          <CircleAction label="Send"     icon={ArrowUpRight}  onClick={onSend}     color="#818cf8" bg="rgba(129,140,248,0.15)" glow="rgba(129,140,248,0.3)" />
-          <CircleAction label="Receive"  icon={ArrowDownLeft} onClick={onReceive}  color="#fbbf24" bg="rgba(251,191,36,0.15)"  glow="rgba(251,191,36,0.3)"  />
-          <CircleAction label="Bills"    icon={Smartphone}    onClick={onBills}    color="#f472b6" bg="rgba(244,114,182,0.15)" glow="rgba(244,114,182,0.3)" />
-          <CircleAction label="Withdraw" icon={Building2}     onClick={onWithdraw} color="#38bdf8" bg="rgba(56,189,248,0.15)"  glow="rgba(56,189,248,0.3)"  />
+      {/* ── Quick actions ─────────────────────────────────────────────────── */}
+      <div className="px-5 pt-5 pb-2">
+        <div
+          className="flex items-start justify-between px-4 py-4 rounded-2xl"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <CircleAction label="Add Money" icon={Plus}          onClick={onAddMoney}  color="#00c47d" bg="rgba(0,196,125,0.14)"   glow="rgba(0,196,125,0.45)"   primary />
+          <CircleAction label="Send"      icon={ArrowUpRight}  onClick={onSend}      color="#818cf8" bg="rgba(129,140,248,0.14)" glow="rgba(129,140,248,0.3)" />
+          <CircleAction label="Receive"   icon={ArrowDownLeft} onClick={onReceive}   color="#fbbf24" bg="rgba(251,191,36,0.14)"  glow="rgba(251,191,36,0.3)"  />
+          <CircleAction label="Bills"     icon={Smartphone}    onClick={onBills}     color="#f472b6" bg="rgba(244,114,182,0.14)" glow="rgba(244,114,182,0.3)" />
+          <CircleAction label="Withdraw"  icon={Building2}     onClick={onWithdraw}  color="#38bdf8" bg="rgba(56,189,248,0.14)"  glow="rgba(56,189,248,0.3)"  />
         </div>
       </div>
 
       {/* ── Quick Send ────────────────────────────────────────────────────── */}
-      <div className="px-5 pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>Quick Send</h3>
-          <button className="text-xs font-medium" style={{ color: '#00c47d' }}>See all</button>
+      <div className="px-5 pt-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-[13px] font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>Quick Send</h3>
+          <button className="text-[12px] font-semibold" style={{ color: '#00c47d' }}>See all</button>
         </div>
-        <div className="flex gap-5 overflow-x-auto pb-1 no-scrollbar">
-          {contacts.slice(0, 5).map(c => (
-            <button key={c.id} onClick={onSend} className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
-              <Avatar initials={c.initials} color={c.color} size={52} />
-              <span className="text-[11px] font-medium text-center" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                {c.name.split(' ')[0]}
-              </span>
+        <div
+          className="rounded-2xl px-4 py-4"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <div className="flex gap-5 overflow-x-auto pb-1 no-scrollbar">
+            {contacts.slice(0, 5).map(c => (
+              <button key={c.id} onClick={onSend} className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
+                <div className="relative">
+                  <Avatar initials={c.initials} color={c.color} size={50} />
+                  <div
+                    className="absolute -bottom-0.5 -right-0.5 w-[14px] h-[14px] rounded-full"
+                    style={{ background: '#00c47d', border: '2px solid #060d18', boxShadow: '0 0 6px rgba(0,196,125,0.6)' }}
+                  />
+                </div>
+                <span className="text-[11px] font-medium text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {c.name.split(' ')[0]}
+                </span>
+              </button>
+            ))}
+            <button onClick={onSend} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+              <div
+                className="w-[50px] h-[50px] rounded-full flex items-center justify-center"
+                style={{
+                  background: 'rgba(0,196,125,0.06)',
+                  border: '1.5px dashed rgba(0,196,125,0.3)',
+                }}
+              >
+                <Plus size={16} style={{ color: '#00c47d' }} />
+              </div>
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.35)' }}>New</span>
             </button>
-          ))}
-          <button onClick={onSend} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-            <div
-              className="w-[52px] h-[52px] rounded-full flex items-center justify-center"
-              style={{ background: 'rgba(0,196,125,0.08)', border: '1.5px dashed rgba(0,196,125,0.35)' }}
-            >
-              <Plus size={18} style={{ color: '#00c47d' }} />
-            </div>
-            <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.38)' }}>New</span>
-          </button>
+          </div>
         </div>
       </div>
 
       {/* ── Recent Activity ───────────────────────────────────────────────── */}
-      <div className="px-5 pt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>Recent Activity</h3>
-          <button className="text-xs font-medium" style={{ color: '#00c47d' }}>View all</button>
+      <div className="px-5 pt-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-[13px] font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>Recent Activity</h3>
+          <button className="text-[12px] font-semibold" style={{ color: '#00c47d' }}>View all</button>
         </div>
         <div
           className="rounded-2xl overflow-hidden"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+          style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.025) 100%)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.25)',
+          }}
         >
           {transactions.map((tx, i) => (
             <div key={tx.id}>
-              <div className="flex items-center gap-3 px-4 py-4">
+              <motion.div
+                className="flex items-center gap-3 px-4 py-4 active:bg-white/[0.03] transition-colors"
+                whileTap={{ scale: 0.99 }}
+              >
                 <div className="relative">
                   <Avatar initials={tx.initials} color={tx.color} size={44} />
                   <div
                     className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full flex items-center justify-center"
                     style={{
-                      background: tx.type === 'sent' ? 'rgba(249,115,22,0.18)' : 'rgba(0,196,125,0.18)',
-                      border: '1.5px solid rgba(8,15,26,0.8)',
+                      background: tx.type === 'sent' ? '#F97316' : '#00c47d',
+                      border: '2px solid #060d18',
+                      boxShadow: tx.type === 'sent' ? '0 0 8px rgba(249,115,22,0.5)' : '0 0 8px rgba(0,196,125,0.5)',
                     }}
                   >
                     {tx.type === 'sent'
-                      ? <ArrowUpRight size={10} style={{ color: '#F97316' }} />
-                      : <ArrowDownLeft size={10} style={{ color: '#00c47d' }} />}
+                      ? <ArrowUpRight size={9} color="white" />
+                      : <ArrowDownLeft size={9} color="white" />}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.88)' }}>{tx.name}</p>
+                  <p className="text-[14px] font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>{tx.name}</p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <CheckCircle2 size={10} style={{ color: '#00c47d' }} />
                     <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
@@ -385,24 +453,29 @@ export default function HomeScreen({
                     </span>
                   </div>
                 </div>
-                <p
-                  className="text-sm font-bold tabular"
-                  style={{ color: tx.amount > 0 ? '#00c47d' : 'rgba(255,255,255,0.65)' }}
-                >
-                  {fmtAmount(tx.amount)}
-                </p>
-              </div>
+                <div className="text-right">
+                  <p
+                    className="text-[14px] font-bold tabular"
+                    style={{ color: tx.amount > 0 ? '#00c47d' : 'rgba(255,255,255,0.7)' }}
+                  >
+                    {tx.amount > 0 ? '+' : ''}{fmtAmount(tx.amount)}
+                  </p>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    {tx.type === 'sent' ? 'Debit' : 'Credit'}
+                  </p>
+                </div>
+              </motion.div>
               {i < transactions.length - 1 && (
                 <div className="mx-4 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />
               )}
             </div>
           ))}
           <button
-            className="w-full py-3.5 flex items-center justify-center gap-1"
+            className="w-full py-3.5 flex items-center justify-center gap-1.5"
             style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
           >
-            <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.38)' }}>View all transactions</span>
-            <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.25)' }} />
+            <span className="text-[12px] font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>View all transactions</span>
+            <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.28)' }} />
           </button>
         </div>
       </div>
@@ -410,19 +483,31 @@ export default function HomeScreen({
       {/* ── Account completion nudge ──────────────────────────────────────── */}
       <div className="px-5 pt-4 pb-2">
         <button
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl active:scale-[0.98] transition-transform"
-          style={{ background: 'rgba(0,196,125,0.06)', border: '1px solid rgba(0,196,125,0.14)' }}
+          className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-transform"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,196,125,0.08), rgba(56,189,248,0.06))',
+            border: '1px solid rgba(0,196,125,0.16)',
+            boxShadow: '0 2px 12px rgba(0,196,125,0.08)',
+          }}
         >
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(0,196,125,0.14)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, rgba(0,196,125,0.2), rgba(0,196,125,0.1))',
+              border: '1px solid rgba(0,196,125,0.25)',
+            }}
           >
-            <span className="text-[10px] font-bold" style={{ color: '#00c47d' }}>40%</span>
+            <span className="text-[10px] font-extrabold" style={{ color: '#00c47d' }}>40%</span>
           </div>
-          <p className="text-[13px] font-medium flex-1 text-left" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            Finish account setup to unlock higher limits
-          </p>
-          <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+          <div className="flex-1 text-left">
+            <p className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              Finish account setup
+            </p>
+            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Unlock higher limits and faster transfers
+            </p>
+          </div>
+          <ChevronRight size={15} style={{ color: 'rgba(255,255,255,0.28)', flexShrink: 0 }} />
         </button>
       </div>
 
