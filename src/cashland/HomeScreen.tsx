@@ -159,7 +159,7 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
     ? `${usdcEquiv.toFixed(4)} USDC equiv · Rate updated ${rateTime}`
     : isConnected
       ? isLoading ? 'Loading balance...' : `${usdcFloat.toFixed(4)} USDC · Rate updated ${rateTime}`
-      : 'Connect wallet to see live balance';
+      : 'Add money to get started';
 
   // FX equivalents for activity amounts
   function fmtAmount(ngnAmount: number): string {
@@ -236,13 +236,11 @@ export default function HomeScreen({ onSend, onReceive, onAddMoney, onWithdraw, 
             >
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="display text-4xl font-bold tabular" style={{ color: 'var(--ink)', letterSpacing: '-0.03em' }}>
-                  {!isConnected
-                    ? <span style={{ color: 'var(--muted)' }}>—</span>
-                    : isLoading && isConnected
-                      ? <span className="text-3xl" style={{ color: 'var(--muted)' }}>Loading...</span>
-                      : !balanceVisible
-                        ? '••••••'
-                        : primaryBalance
+                  {isLoading && isConnected
+                    ? <span className="text-3xl" style={{ color: 'var(--muted)' }}>Loading...</span>
+                    : !balanceVisible
+                      ? '••••••'
+                      : primaryBalance ?? (currency === 'NGN' ? '₦0.00' : currency === 'USD' ? '$0.00' : '£0.00')
                   }
                 </span>
               </div>
