@@ -5,22 +5,25 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export type Currency = 'NGN' | 'USD' | 'GBP';
+export type Currency = 'NGN' | 'USD' | 'EUR' | 'GBP';
 
 export const CURRENCY_SYMBOLS: Record<Currency, string> = {
   NGN: '₦',
   USD: '$',
+  EUR: '€',
   GBP: '£',
 };
 
 export const CURRENCY_LABELS: Record<Currency, string> = {
   NGN: 'Naira',
   USD: 'US Dollar',
+  EUR: 'Euro',
   GBP: 'British Pound',
 };
 
 const FALLBACK_NGN = 1559;
-const GBP_PER_USDC = 0.79; // approximate GBP/USD cross
+const GBP_PER_USDC = 0.79;  // approximate GBP/USD cross
+const EUR_PER_USDC = 0.92;  // approximate EUR/USD cross
 
 export interface FxRates {
   rates: Record<Currency, number>;
@@ -32,6 +35,7 @@ export interface FxRates {
 let globalRates: Record<Currency, number> = {
   NGN: FALLBACK_NGN,
   USD: 1.00,
+  EUR: EUR_PER_USDC,
   GBP: GBP_PER_USDC,
 };
 let globalUpdatedAt = new Date(0);
@@ -48,7 +52,7 @@ async function fetchLiveRates(): Promise<void> {
     const data = await res.json() as { ngnPerUsdc?: number };
     const ngn = data?.ngnPerUsdc;
     if (ngn && ngn > 500 && ngn < 10000) {
-      globalRates = { NGN: ngn, USD: 1.00, GBP: GBP_PER_USDC };
+      globalRates = { NGN: ngn, USD: 1.00, EUR: EUR_PER_USDC, GBP: GBP_PER_USDC };
       globalUpdatedAt = new Date();
       notifyListeners();
     }
@@ -123,11 +127,12 @@ export function formatUsdcAs(usdc: number, currency: Currency, rates: Record<Cur
   return formatCurrency(converted, currency, decimals);
 }
 
-// Show all three equivalents for an amount in NGN
+// Show all equivalents for an amount in NGN
 export function getFxBreakdown(ngnAmount: number, rates: Record<Currency, number>): string {
   const usd = convertFromNgn(ngnAmount, 'USD', rates);
+  const eur = convertFromNgn(ngnAmount, 'EUR', rates);
   const gbp = convertFromNgn(ngnAmount, 'GBP', rates);
-  return `$${usd.toFixed(2)} · £${gbp.toFixed(2)}`;
+  return `$${usd.toFixed(2)} · €${eur.toFixed(2)} · £${gbp.toFixed(2)}`;
 }
 
 // Currency preference stored in localStorage
@@ -136,7 +141,7 @@ const PREF_KEY = 'cashland_currency';
 export function loadCurrencyPref(): Currency {
   try {
     const v = localStorage.getItem(PREF_KEY);
-    if (v === 'NGN' || v === 'USD' || v === 'GBP') return v;
+    if (v === 'NGN' || v === 'USD' || v === 'EUR' || v === 'GBP') return v;
   } catch { /* ignore */ }
   return 'NGN';
 }

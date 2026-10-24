@@ -134,13 +134,14 @@ export default function HomeScreen({
     ? formatUsdcAs(usdcEquiv, currency, rates)
     : isConnected ? formatUsdcAs(usdcFloat, currency, rates) : null;
 
-  const zeroBalance = currency === 'NGN' ? '₦0.00' : currency === 'USD' ? '$0.00' : '£0.00';
+  const CURRENCY_SYMS: Record<string, string> = { NGN: '₦', USD: '$', EUR: '€', GBP: '£' };
+  const zeroBalance = `${CURRENCY_SYMS[currency] ?? '₦'}0.00`;
 
   function fmtAmount(ngnAmount: number): string {
     if (currency === 'NGN') return formatNaira(ngnAmount);
     const usdc = ngnAmount / rates.NGN;
-    const converted = usdc * rates[currency];
-    const sym = currency === 'USD' ? '$' : '£';
+    const converted = usdc * (rates[currency] ?? 1);
+    const sym = CURRENCY_SYMS[currency] ?? '$';
     const sign = ngnAmount < 0 ? '-' : '+';
     return `${sign}${sym}${Math.abs(converted).toFixed(2)}`;
   }
@@ -152,13 +153,7 @@ export default function HomeScreen({
     });
   }
 
-  const currencies: Currency[] = ['NGN', 'USD', 'GBP'];
-  function cycleCurrency() {
-    setCurrency(c => {
-      const i = currencies.indexOf(c);
-      return currencies[(i + 1) % currencies.length];
-    });
-  }
+  const currencies: Currency[] = ['NGN', 'USD', 'EUR', 'GBP'];
 
   return (
     <div className="pb-28 min-h-screen" style={{ background: '#060d18' }}>
@@ -267,7 +262,8 @@ export default function HomeScreen({
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.18 }}
               >
-                <button onClick={cycleCurrency} className="flex items-end gap-2.5 mb-1 active:opacity-80 transition-opacity">
+                {/* Balance number */}
+                <div className="flex items-end gap-2.5 mb-3">
                   <span style={{
                     color: 'white',
                     fontSize: 46,
@@ -282,20 +278,31 @@ export default function HomeScreen({
                         ? <span style={{ fontSize: 34, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em', fontWeight: 400 }}>••••••</span>
                         : primaryBalance ?? zeroBalance}
                   </span>
-                  <span
-                    className="text-[11px] font-bold px-2 py-1 rounded-lg mb-1.5"
-                    style={{
-                      background: 'rgba(0,196,125,0.18)',
-                      color: '#00c47d',
-                      border: '1px solid rgba(0,196,125,0.25)',
-                    }}
-                  >
-                    {currency}
-                  </span>
-                </button>
-                <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>
-                  Add money to get started
-                </p>
+                </div>
+
+                {/* Currency segmented toggle pill */}
+                <div
+                  className="flex items-center gap-0.5 p-1 rounded-2xl self-start mb-1"
+                  style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.08)' }}
+                >
+                  {currencies.map(c => (
+                    <button
+                      key={c}
+                      onClick={() => setCurrency(c)}
+                      className="px-3 py-1 rounded-xl text-[11px] font-bold transition-all active:scale-95"
+                      style={currency === c ? {
+                        background: '#00c47d',
+                        color: 'white',
+                        boxShadow: '0 2px 10px rgba(0,196,125,0.45)',
+                      } : {
+                        color: 'rgba(255,255,255,0.42)',
+                        background: 'transparent',
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
               </motion.div>
             </AnimatePresence>
 
