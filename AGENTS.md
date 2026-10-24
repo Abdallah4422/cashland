@@ -8,7 +8,7 @@ This is the **project memory** - what Arc Studio remembers about building this a
 
 ## What This App Does
 
-Cashland is a Nigerian-first onchain payment wallet. Users send and receive money using phone numbers, CashTags (@musa), QR codes, or wallet addresses. Money is displayed in Nigerian Naira (NGN). Blockchain settlement runs invisibly underneath using USDC on Arc Testnet.
+Cashland is a Nigerian-first onchain payment wallet. Users send and receive money using phone numbers, CashTags (@musa), QR codes, or wallet addresses. Money is displayed in Nigerian Naira (NGN). Blockchain settlement runs invisibly underneath using USDC on Arc Mainnet.
 
 ## Deployed Contracts
 
@@ -38,8 +38,8 @@ Cashland is a Nigerian-first onchain payment wallet. Users send and receive mone
 - Web3: wagmi v2, viem v2, ConnectKit
 - Contracts: Solidity 0.8.28 + Foundry. Sources in `contracts/`, unit tests in `contracts/test/*.t.sol`. Build with `bun run contracts:build` (`forge build`), test with `bun run contracts:test` (`forge test`).
 - Wallet: injected (MetaMask, etc.)
-- Chain: Arc Testnet (Chain ID: 5042002, imported from `viem/chains`)
-- Token: USDC (6 decimals) (Address: 0x3600000000000000000000000000000000000000, Chain: Arc Testnet)
+- Chain: Arc Mainnet (Chain ID: 5042, imported from `viem/chains`)
+- Token: USDC (6 decimals) (Address: 0x3600000000000000000000000000000000000000, Chain: Arc Mainnet)
 - Toasts: Sonner
 
 ## Key Files
