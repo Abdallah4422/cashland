@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { navyGradient } from './design';
+
 
 interface Props {
   onDone: () => void;
@@ -29,7 +29,7 @@ export default function SplashScreen({ onDone }: Props) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 24, delay: 0.1 }}
       >
-        {/* Logo mark */}
+        {/* Full logo card */}
         <motion.div
           className="relative"
           initial={{ opacity: 0, y: 20 }}
@@ -37,25 +37,11 @@ export default function SplashScreen({ onDone }: Props) {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <div
-            className="w-24 h-24 rounded-3xl overflow-hidden flex items-center justify-center"
-            style={{ background: '#0a1628', border: '1.5px solid rgba(0,168,107,0.35)', boxShadow: '0 0 40px rgba(0,168,107,0.25), 0 8px 32px rgba(0,0,0,0.4)' }}
+            className="rounded-3xl overflow-hidden flex items-center justify-center"
+            style={{ width: 280, height: 175, background: '#1a2744', border: '1.5px solid rgba(148,163,184,0.18)', boxShadow: '0 0 60px rgba(26,39,68,0.8), 0 12px 48px rgba(0,0,0,0.5)' }}
           >
-            <img src="/brand/cashland-icon.svg" alt="Cashland" width="96" height="96" style={{ display: 'block' }} />
+            <img src="/brand/cashland-logo.svg" alt="Cashland" width="280" height="175" style={{ display: 'block' }} />
           </div>
-        </motion.div>
-
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.5 }}
-        >
-          <h1 className="display text-4xl font-bold text-white tracking-tight" style={{ letterSpacing: '-0.03em' }}>
-            Cashland
-          </h1>
-          <p className="text-white/70 text-base mt-1.5 font-medium">
-            Money moves better here.
-          </p>
         </motion.div>
       </motion.div>
 

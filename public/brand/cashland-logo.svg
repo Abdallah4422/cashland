@@ -1,73 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" fill="none">
-  <!--
-    Cashland full logo — icon + wordmark, white on transparent.
-    Icon: 72x72 coin-C badge (no background rect, transparent)
-    Wordmark: "cashland" in geometric stroked type, baseline-aligned
-    Use on dark navy #080f1a / #0a1628 backgrounds.
-  -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 544 340" width="544" height="340">
+  <!-- Background card -->
+  <rect width="544" height="340" rx="24" fill="#1a2744"/>
 
-  <!-- ═══ ICON (left, 72×72 centred in 80px tall canvas) ═══ -->
-  <g transform="translate(4, 4)">
-    <!-- Coin outer ring -->
-    <circle cx="36" cy="36" r="30" stroke="white" stroke-width="5" fill="none"/>
-    <!-- Coin inner fill hint -->
-    <circle cx="36" cy="36" r="23" fill="white" opacity="0.07"/>
+  <!-- Floating circles top-left arc -->
+  <circle cx="182" cy="72" r="22" fill="#9ca3af" opacity="0.7"/>
+  <circle cx="148" cy="48" r="15" fill="#9ca3af" opacity="0.5"/>
+  <circle cx="120" cy="30" r="10" fill="#9ca3af" opacity="0.35"/>
 
-    <!-- Stack shadow (cash depth) -->
-    <ellipse cx="36" cy="67" rx="20" ry="4" fill="white" opacity="0.10"/>
-    <ellipse cx="36" cy="63" rx="20" ry="4" fill="white" opacity="0.12"/>
+  <!-- Floating circles top-right arc -->
+  <circle cx="362" cy="72" r="22" fill="#9ca3af" opacity="0.7"/>
+  <circle cx="396" cy="48" r="15" fill="#9ca3af" opacity="0.5"/>
+  <circle cx="424" cy="30" r="10" fill="#9ca3af" opacity="0.35"/>
 
-    <!-- C arc top -->
-    <path d="M52 24 C48 16 30 14 22 24" stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <!-- C arc bottom -->
-    <path d="M52 48 C48 56 30 58 22 48" stroke="white" stroke-width="5" stroke-linecap="round" fill="none"/>
-    <!-- C left spine -->
-    <line x1="22" y1="24" x2="22" y2="48" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <!-- Coin platform / shelf -->
+  <rect x="148" y="188" width="248" height="10" rx="5" fill="#9ca3af" opacity="0.5"/>
+  <!-- Shelf legs -->
+  <rect x="164" y="192" width="8" height="18" rx="2" fill="#9ca3af" opacity="0.4"/>
+  <rect x="372" y="192" width="8" height="18" rx="2" fill="#9ca3af" opacity="0.4"/>
 
-    <!-- Currency strike lines -->
-    <line x1="30" y1="31" x2="50" y2="31" stroke="white" stroke-width="3.2" stroke-linecap="round"/>
-    <line x1="30" y1="41" x2="50" y2="41" stroke="white" stroke-width="3.2" stroke-linecap="round"/>
+  <!-- Left coin (Naira) -->
+  <circle cx="216" cy="150" r="52" fill="#e5e7eb"/>
+  <circle cx="216" cy="150" r="46" fill="#f1f5f9"/>
+  <circle cx="216" cy="150" r="40" fill="#e2e8f0"/>
+  <!-- Naira symbol -->
+  <text x="216" y="162" text-anchor="middle" font-family="Georgia, serif" font-size="38" font-weight="700" fill="#1a2744">₦</text>
 
-    <!-- Green accent dot at top of coin -->
-    <circle cx="36" cy="6" r="3" fill="#00A86B"/>
-  </g>
+  <!-- Right coin (Dollar) -->
+  <circle cx="328" cy="150" r="52" fill="#e5e7eb"/>
+  <circle cx="328" cy="150" r="46" fill="#f1f5f9"/>
+  <circle cx="328" cy="150" r="40" fill="#e2e8f0"/>
+  <!-- Dollar symbol -->
+  <text x="328" y="162" text-anchor="middle" font-family="Georgia, serif" font-size="38" font-weight="700" fill="#1a2744">$</text>
 
-  <!-- ═══ WORDMARK (right of icon, starts at x=92) ═══ -->
-  <g transform="translate(92, 8)">
+  <!-- Wordmark -->
+  <text x="272" y="252" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="48" font-weight="700" letter-spacing="-1" fill="white">Cashland</text>
 
-    <!-- C -->
-    <path d="M0 14 C0 6 8 0 20 0 C32 0 40 6 42 14" stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-    <path d="M0 50 C0 58 8 64 20 64 C32 64 40 58 42 50" stroke="white" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-    <line x1="0" y1="14" x2="0" y2="50" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
-    <line x1="14" y1="27" x2="36" y2="27" stroke="white" stroke-width="2.8" stroke-linecap="round" opacity="0.75"/>
-    <line x1="14" y1="37" x2="36" y2="37" stroke="white" stroke-width="2.8" stroke-linecap="round" opacity="0.75"/>
-
-    <!-- a -->
-    <path d="M52 26 C52 20 57 18 63 18 C69 18 75 20 75 28 L75 55 C73 59 69 64 63 64 C57 64 52 60 52 54 C52 48 57 44 67 44 L75 44" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-
-    <!-- s -->
-    <path d="M88 24 C88 20 92 18 97 18 C102 18 108 20 108 26 C108 32 101 34 97 36 C93 38 86 40 86 48 C86 54 92 58 99 58 C105 58 110 55 110 51" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
-
-    <!-- h -->
-    <line x1="120" y1="0" x2="120" y2="64" stroke="white" stroke-width="4" stroke-linecap="round"/>
-    <path d="M120 34 C124 24 131 18 139 18 C147 18 149 24 149 32 L149 64" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
-
-    <!-- · separator dot -->
-    <circle cx="163" cy="32" r="2.5" fill="#00A86B"/>
-
-    <!-- L -->
-    <line x1="172" y1="0" x2="172" y2="64" stroke="white" stroke-width="4" stroke-linecap="round"/>
-    <line x1="172" y1="64" x2="197" y2="64" stroke="white" stroke-width="4" stroke-linecap="round"/>
-
-    <!-- a -->
-    <path d="M206 26 C206 20 211 18 217 18 C223 18 229 20 229 28 L229 55 C227 59 223 64 217 64 C211 64 206 60 206 54 C206 48 211 44 221 44 L229 44" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-
-    <!-- n -->
-    <line x1="239" y1="18" x2="239" y2="64" stroke="white" stroke-width="4" stroke-linecap="round"/>
-    <path d="M239 32 C243 22 250 18 258 18 C266 18 268 24 268 32 L268 64" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
-
-    <!-- d -->
-    <line x1="292" y1="0" x2="292" y2="64" stroke="white" stroke-width="4" stroke-linecap="round"/>
-    <path d="M292 24 C288 18 282 16 276 18 C270 20 266 26 266 40 C266 54 270 62 276 64 C282 66 288 62 292 56" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
-  </g>
+  <!-- Tagline -->
+  <text x="272" y="284" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="17" font-weight="400" letter-spacing="0.5" fill="#94a3b8">Cash that lands fast</text>
 </svg>
