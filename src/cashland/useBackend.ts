@@ -80,7 +80,8 @@ export function useBackend(): BackendState & BackendActions {
   useEffect(() => {
     void (async () => {
       try {
-        const res = await fetch('/api/health');
+        const base: string = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
+        const res = await fetch(`${base}/health`);
         if (!res.ok) throw new Error('offline');
         setStatus('online');
         statusRef.current = 'online';
