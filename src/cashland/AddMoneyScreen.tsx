@@ -582,10 +582,11 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
   const { address, isConnected } = useAccount();
   const { formattedNgn, usdcFloat, refetch } = useUsdcBalance();
 
-  const depositAddress = isConnected && address ? address : '0x71F3A29f8C6B2e9214aEc81cC129284C3bA492AD';
-  const short = depositAddress.slice(0, 10) + '...' + depositAddress.slice(-6);
+  const depositAddress = isConnected && address ? address : null;
+  const short = depositAddress ? depositAddress.slice(0, 10) + '...' + depositAddress.slice(-6) : null;
 
   const handleCopy = () => {
+    if (!depositAddress) return;
     navigator.clipboard.writeText(depositAddress).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -647,18 +648,24 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
           </div>
           <div>
             <p className="text-sm font-semibold" style={{ color: 'white' }}>Your Cashland wallet</p>
-            {isConnected
-              ? <p className="text-xs" style={{ color: 'var(--brand)' }}>Connected</p>
-              : <p className="text-xs" style={{ color: 'rgba(255,255,255,0.50)' }}>Connect wallet to see live address</p>
-            }
+            <p className="text-xs" style={{ color: depositAddress ? 'var(--brand)' : 'rgba(255,255,255,0.50)' }}>
+              {depositAddress ? 'Arc Mainnet · USDC' : 'Tap below to connect your wallet'}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-3" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          <span className="text-sm mono flex-1 text-center" style={{ color: 'white' }}>{short}</span>
-          <button onClick={handleCopy} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,168,107,0.15)' }}>
-            {copied ? <Check size={13} style={{ color: 'var(--brand)' }} /> : <Copy size={13} style={{ color: 'var(--brand)' }} />}
-          </button>
-        </div>
+        {depositAddress ? (
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-3" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <span className="text-sm mono flex-1 text-center" style={{ color: 'white' }}>{short}</span>
+            <button onClick={handleCopy} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,168,107,0.15)' }}>
+              {copied ? <Check size={13} style={{ color: 'var(--brand)' }} /> : <Copy size={13} style={{ color: 'var(--brand)' }} />}
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center px-3 py-3 rounded-xl mb-3 gap-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.15)' }}>
+            <Wallet size={14} style={{ color: 'rgba(255,255,255,0.35)' }} />
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>Connect a wallet to get your deposit address</span>
+          </div>
+        )}
         {/* Simple QR placeholder */}
         <div className="flex justify-center">
           <div className="w-36 h-36 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)', border: '2px solid rgba(0,168,107,0.12)' }}>

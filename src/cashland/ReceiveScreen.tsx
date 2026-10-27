@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Share2, Copy, Check, QrCode, Download, AlertTriangle } from 'lucide-react';
 import { brandGradient, formatNaira }  from './design';
 import { Avatar } from './HomeScreen';
+import { useAccount } from 'wagmi';
 
 interface Props {
   onClose: () => void;
@@ -50,6 +51,7 @@ function QrCodeSvg({ size = 200 }: { size?: number }) {
 export default function ReceiveScreen({ onClose }: Props) {
   const [tab, setTab] = useState<Tab>('cashtag');
   const [copied, setCopied] = useState(false);
+  const { address: walletAddress, isConnected } = useAccount();
   const [requestAmount, setRequestAmount] = useState('');
   const [showAmountInput, setShowAmountInput] = useState(false);
 
@@ -223,12 +225,14 @@ export default function ReceiveScreen({ onClose }: Props) {
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(0,0,0,0.07)' }}
                   >
                     <p className="mono text-sm break-all" style={{ color: 'white' }}>
-                      0x71F3a8c492bE14D9...92AD
+                      {isConnected && walletAddress
+                        ? walletAddress.slice(0, 10) + '...' + walletAddress.slice(-6)
+                        : 'Connect wallet to see address'}
                     </p>
                   </div>
                   <div className="flex gap-3">
                     <button
-                      onClick={() => handleCopy('0x71F3a8c492bE14D9...92AD')}
+                      onClick={() => isConnected && walletAddress ? handleCopy(walletAddress) : undefined}
                       className="flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                       style={{ background: 'var(--brand-light)', color: 'var(--brand)' }}
                     >
