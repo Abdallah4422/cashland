@@ -43,9 +43,26 @@ const stepLabels: Record<Step, string> = {
 };
 
 // ── Phone step ────────────────────────────────────────────────
-function PhoneStep({ onNext }: { onNext: (phone: string) => void }) {
+function PhoneStep({ onNext, sendOtp }: { onNext: (phone: string, devCode?: string) => void; sendOtp: (phone: string) => Promise<{ devCode?: string }> }) {
   const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
   const valid = phone.replace(/\D/g, '').length >= 10;
+
+  const handleContinue = async () => {
+    if (!valid || loading) return;
+    setLoading(true);
+    setErr('');
+    try {
+      const full = phone.startsWith('+') ? phone : '+234' + phone.replace(/^0/, '');
+      const res = await sendOtp(full);
+      onNext(full, res.devCode);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Failed to send code. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-full">
@@ -89,14 +106,16 @@ function PhoneStep({ onNext }: { onNext: (phone: string) => void }) {
         </div>
       </div>
 
+      {err ? <p className="text-xs mb-4 text-center" style={{ color: '#f87171' }}>{err}</p> : null}
+
       <div className="mt-auto">
         <button
-          disabled={!valid}
-          onClick={() => onNext(phone)}
+          disabled={!valid || loading}
+          onClick={() => { void handleContinue(); }}
           className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
           style={{ background: brandGradient, boxShadow: valid ? '0 8px 32px rgba(0,168,107,0.45)' : 'none' }}
         >
-          Continue
+          {loading ? 'Sending code...' : 'Continue'}
         </button>
       </div>
     </div>
@@ -104,8 +123,13 @@ function PhoneStep({ onNext }: { onNext: (phone: string) => void }) {
 }
 
 // ── OTP step ───────────────────────────────────────────────────
-function OtpStep({ phone, onNext }: { phone: string; onNext: () => void }) {
+function OtpStep({ phone, devCode, onNext, verifyOtp }: {
+  phone: string; devCode?: string; onNext: () => void;
+  verifyOtp: (phone: string, code: string) => Promise<boolean>;
+}) {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (i: number, val: string) => {
@@ -114,14 +138,30 @@ function OtpStep({ phone, onNext }: { phone: string; onNext: () => void }) {
     newOtp[i] = val.slice(-1);
     setOtp(newOtp);
     if (val && i < 5) refs.current[i + 1]?.focus();
-    if (newOtp.every(d => d)) setTimeout(() => onNext(), 300);
   };
 
   const handleKey = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !otp[i] && i > 0) refs.current[i - 1]?.focus();
   };
 
-  const maskedPhone = '+234 ' + phone.slice(0, 3) + ' *** ' + phone.slice(-4);
+  const handleVerify = async () => {
+    const code = otp.join('');
+    if (code.length < 6 || loading) return;
+    setLoading(true);
+    setErr('');
+    try {
+      const valid = await verifyOtp(phone, code);
+      if (valid) { onNext(); }
+      else { setErr('Incorrect code. Try again.'); setOtp(['', '', '', '', '', '']); refs.current[0]?.focus(); }
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Verification failed. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const maskedPhone = phone.slice(0, 6) + ' *** ' + phone.slice(-4);
+  const codeFull = otp.every(d => d);
 
   return (
     <div className="flex flex-col min-h-full">
@@ -135,9 +175,14 @@ function OtpStep({ phone, onNext }: { phone: string; onNext: () => void }) {
         <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
           Code sent to <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>{maskedPhone}</span>
         </p>
+        {devCode ? (
+          <div className="mt-3 px-3 py-2 rounded-xl text-xs" style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)', color: '#fbbf24' }}>
+            Dev mode: your code is <strong>{devCode}</strong>
+          </div>
+        ) : null}
       </div>
 
-      <div className="flex gap-2.5 justify-center mb-10">
+      <div className="flex gap-2.5 justify-center mb-6">
         {otp.map((digit, i) => (
           <input
             key={i}
@@ -159,13 +204,16 @@ function OtpStep({ phone, onNext }: { phone: string; onNext: () => void }) {
         ))}
       </div>
 
+      {err ? <p className="text-xs mb-4 text-center" style={{ color: '#f87171' }}>{err}</p> : null}
+
       <div className="mt-auto space-y-3">
         <button
-          onClick={onNext}
-          className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98]"
+          disabled={!codeFull || loading}
+          onClick={() => { void handleVerify(); }}
+          className="w-full py-4 rounded-2xl text-base font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-30"
           style={{ background: brandGradient, boxShadow: '0 8px 32px rgba(0,168,107,0.45)' }}
         >
-          Verify Code
+          {loading ? 'Verifying...' : 'Verify Code'}
         </button>
         <button className="w-full py-3 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>
           Resend code · 30s
@@ -539,6 +587,7 @@ function BiometricsStep({ onEnable, onSkip }: { onEnable: () => Promise<void>; o
 export default function RegistrationFlow({ onComplete, backend }: Props) {
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
+  const [devCode, setDevCode] = useState<string | undefined>();
   const [pin, setPin] = useState('');
   const [profile, setProfile] = useState({ firstName: '', lastName: '', tag: '' });
   const [kycTier, setKycTier] = useState<1 | 2>(1);
@@ -607,8 +656,16 @@ export default function RegistrationFlow({ onComplete, backend }: Props) {
             exit={{ opacity: 0, x: -40 }}
             transition={{ type: 'spring', stiffness: 300, damping: 32 }}
           >
-            {step === 'phone' && <PhoneStep onNext={p => { setPhone(p); setStep('otp'); }} />}
-            {step === 'otp' && <OtpStep phone={phone} onNext={() => setStep('profile')} />}
+            {step === 'phone' && <PhoneStep
+              sendOtp={backend?.sendOtp ?? (() => Promise.resolve({}))}
+              onNext={(p, dc) => { setPhone(p); setDevCode(dc); setStep('otp'); }}
+            />}
+            {step === 'otp' && <OtpStep
+              phone={phone}
+              devCode={devCode}
+              verifyOtp={backend?.verifyOtp ?? (() => Promise.resolve(true))}
+              onNext={() => setStep('profile')}
+            />}
             {step === 'profile' && (
               <ProfileStep onNext={(firstName, lastName, tag) => {
                 setProfile({ firstName, lastName, tag });
