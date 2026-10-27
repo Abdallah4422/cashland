@@ -628,7 +628,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
           <RefreshCw size={36} style={{ color: 'var(--brand)' }} />
         </motion.div>
         <h2 className="display text-xl font-bold mb-2" style={{ color: 'white', letterSpacing: '-0.02em' }}>Scanning blockchain...</h2>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>Checking Arc Testnet for your USDC deposit.</p>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.60)' }}>Checking Arc Mainnet for your USDC deposit.</p>
       </div>
     );
   }
@@ -636,7 +636,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
   return (
     <div className="flex flex-col min-h-full px-5 pb-8">
       <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.60)' }}>
-        Send USDC to your Cashland wallet on Arc Testnet. Balance updates automatically on arrival.
+        Send USDC to your Cashland wallet on Arc Mainnet. Balance updates automatically on arrival.
       </p>
 
       {/* Wallet card */}
@@ -688,7 +688,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
       {/* Info table */}
       <div className="rounded-2xl overflow-hidden mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(12px)' }}>
         {[
-          { label: 'Network', value: 'Arc Testnet' },
+          { label: 'Network', value: 'Arc Mainnet' },
           { label: 'Asset', value: 'USDC' },
           { label: 'Minimum', value: '$1.00' },
           { label: 'Arrival', value: 'Under 30 seconds' },
@@ -707,7 +707,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
       <div className="flex items-start gap-2 px-4 py-3 rounded-xl mb-5" style={{ background: 'rgba(255,182,0,0.10)' }}>
         <Info size={13} style={{ color: '#B07800', flexShrink: 0, marginTop: 1 }} />
         <p className="text-xs" style={{ color: '#7A5200' }}>
-          Only send USDC on Arc Testnet. Sending other assets or on a different network may result in permanent loss.
+          Only send USDC on Arc Mainnet. Sending other assets or on a different network may result in permanent loss.
         </p>
       </div>
 

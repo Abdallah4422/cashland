@@ -269,7 +269,7 @@ function ConfirmStep({ amount, note: _note, recipientAddress, onDone, onBack: _o
 
   const ctaLabel = () => {
     if (!isConnected) return 'Connect wallet to send';
-    if (status === 'wrong-chain') return 'Switch to Arc Testnet';
+    if (status === 'wrong-chain') return 'Switch to Arc Mainnet';
     if (status === 'signing') return <span className="flex items-center justify-center gap-2"><Loader2 size={16} className="animate-spin" />Confirm in wallet...</span>;
     if (status === 'confirming') return <span className="flex items-center justify-center gap-2"><Loader2 size={16} className="animate-spin" />Confirming on chain...</span>;
     if (status === 'success') return <span className="flex items-center justify-center gap-2"><CheckCircle2 size={16} />Payment confirmed</span>;
