@@ -9,6 +9,7 @@ import { useAccount } from 'wagmi';
 import { navyGradient, brandGradient, formatNaira } from './design';
 import { useUsdcBalance, NGN_PER_USDC } from './useUsdcBalance';
 import { pushDepositNotification } from './useNotifications';
+import { account as accountApi } from './api';
 
 interface Props { onClose: () => void; onDeposited?: () => void; }
 
@@ -579,10 +580,22 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
   const [prevFloat, setPrevFloat] = useState<number | null>(null);
   const [txRef] = useState(() => 'CL' + Math.random().toString(36).slice(2, 10).toUpperCase());
   const [confirmedAt] = useState(() => new Date());
-  const { address, isConnected } = useAccount();
+  const { address: wagmiAddress, isConnected } = useAccount();
   const { formattedNgn, usdcFloat, refetch } = useUsdcBalance();
 
-  const depositAddress = isConnected && address ? address : null;
+  // Fetch Circle-managed wallet address from backend
+  const [circleAddress, setCircleAddress] = useState<string | null>(null);
+  const [addressLoading, setAddressLoading] = useState(true);
+  useEffect(() => {
+    accountApi.wallet().then(w => {
+      setCircleAddress(w.address ?? null);
+    }).catch(() => {
+      setCircleAddress(null);
+    }).finally(() => setAddressLoading(false));
+  }, []);
+
+  // Prefer Circle wallet; fall back to connected wagmi wallet
+  const depositAddress = circleAddress ?? (isConnected && wagmiAddress ? wagmiAddress : null);
   const short = depositAddress ? depositAddress.slice(0, 10) + '...' + depositAddress.slice(-6) : null;
 
   const handleCopy = () => {
@@ -649,7 +662,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
           <div>
             <p className="text-sm font-semibold" style={{ color: 'white' }}>Your Cashland wallet</p>
             <p className="text-xs" style={{ color: depositAddress ? 'var(--brand)' : 'rgba(255,255,255,0.50)' }}>
-              {depositAddress ? 'Arc Mainnet · USDC' : 'Tap below to connect your wallet'}
+              {depositAddress ? 'Arc Mainnet · USDC' : addressLoading ? 'Loading your wallet...' : 'Wallet not ready yet'}
             </p>
           </div>
         </div>

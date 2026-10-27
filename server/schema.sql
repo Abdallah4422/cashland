@@ -180,3 +180,10 @@ CREATE TABLE IF NOT EXISTS fraud_flags (
 );
 
 CREATE INDEX IF NOT EXISTS idx_fraud_flags_user ON fraud_flags(user_id, flagged_at DESC);
+
+-- ─── APP CONFIG ───────────────────────────────────────────────────────────────
+-- Key-value store for app-level config (e.g. Circle wallet set id).
+CREATE TABLE IF NOT EXISTS app_config (
+  key    TEXT PRIMARY KEY,
+  value  TEXT NOT NULL
+);

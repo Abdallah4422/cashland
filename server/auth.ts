@@ -7,6 +7,7 @@ import {
   hashPin, verifyPin, generateAccountNumber, nanoid
 } from './crypto.js';
 import { ensureAccounts } from './ledger.js';
+import { createUserWallet } from './circle-wallets.js';
 
 export interface User {
   id: bigint;
@@ -88,6 +89,11 @@ export async function registerUser(params: {
 
   // Create ledger accounts
   await ensureAccounts(userId);
+
+  // Create Circle Arc Mainnet wallet for USDC deposits (non-blocking — don't fail reg if Circle is down)
+  createUserWallet(userId).catch(e => {
+    console.error('[auth] Circle wallet creation failed for user', String(userId), e?.message);
+  });
 
   // Create virtual bank account
   const accountNumber = generateAccountNumber();

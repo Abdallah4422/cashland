@@ -19,6 +19,7 @@ import {
   getBalanceByUser, getTransactions, transferNgn,
   creditDeposit
 } from './ledger.js';
+import { getUserWalletAddress, createUserWallet } from './circle-wallets.js';
 import { verifyBvn, verifyNin } from './kyc.js';
 import { sha256, generateDisputeRef, nanoid } from './crypto.js';
 import { rateLimitExceeded, checkVelocity } from './ratelimit.js';
@@ -212,19 +213,29 @@ async function handle(req: Request): Promise<Response> {
 
     // ── WALLET REGISTRATION (USDC sync) ───────────────────────────────────────
 
-    if (method === 'POST' && path === '/account/wallet') {
+    // GET /account/wallet — returns the user's primary Circle Arc Mainnet deposit address
+    if (method === 'GET' && path === '/account/wallet') {
       const user = await requireAuth(req);
       if (!user) return err('Unauthorized', 401);
-      // Do not associate an arbitrary address with an account until the user
-      // proves control with a signed challenge.
-      return err('Wallet registration is temporarily disabled pending ownership verification.', 503);
+      let address = await getUserWalletAddress(user.id);
+      // If not created yet (e.g. Circle was down at registration), create now
+      if (!address) {
+        try {
+          address = await createUserWallet(user.id);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          console.error('[wallet] lazy creation failed', msg);
+          return json({ address: null, pending: true });
+        }
+      }
+      return json({ address, blockchain: 'ARC', network: 'mainnet' });
     }
 
     if (method === 'GET' && path === '/account/wallets') {
       const user = await requireAuth(req);
       if (!user) return err('Unauthorized', 401);
-      const wallets = await getUserWallets(user.id);
-      return json({ wallets });
+      const address = await getUserWalletAddress(user.id);
+      return json({ wallets: address ? [{ address, blockchain: 'ARC' }] : [] });
     }
 
     // ── USDC SYNC ─────────────────────────────────────────────────────────────

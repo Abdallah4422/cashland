@@ -97,9 +97,17 @@ export interface VirtualAccount {
   reference: string;
 }
 
+export interface WalletAddress {
+  address: string | null;
+  blockchain: string;
+  network: string;
+  pending?: boolean;
+}
+
 export const account = {
   balance: () => get<Balance>('/account/balance'),
   virtual: () => get<VirtualAccount>('/account/virtual'),
+  wallet: () => get<WalletAddress>('/account/wallet'),
 };
 
 // ─── LOOKUP ───────────────────────────────────────────────────────────────
