@@ -5,30 +5,35 @@ import OnboardingScreen from './cashland/OnboardingScreen';
 import RegistrationFlow from './cashland/RegistrationFlow';
 import MainApp from './cashland/MainApp';
 import { BackendProvider, useBackendContext } from './cashland/BackendContext';
-import { loadSession } from './cashland/useUserSession';
 
 // Cashland — Nigerian-first onchain payment wallet
-type AppState = 'splash' | 'onboarding' | 'registration' | 'app';
-
-function getInitialState(): AppState {
-  // Check localStorage session OR backend token
-  const session = loadSession();
-  const token = localStorage.getItem('cashland_token_v1');
-  return session || token ? 'app' : 'splash';
-}
+// 'splash-pending' = splash shown, backend still checking
+// 'splash-done'    = splash done, waiting for backend result
+type AppPhase = 'splash' | 'onboarding' | 'registration' | 'app';
 
 function AppInner() {
   const backend = useBackendContext();
-  const [appState, setAppState] = useState<AppState>(getInitialState);
+  const [splashDone, setSplashDone] = useState(false);
+  // Explicit override only used for registration→app and sign-out flows
+  const [forcePhase, setForcePhase] = useState<AppPhase | null>(null);
+
+  // Derive current phase from state — no setState inside effects
+  const appPhase: AppPhase = (() => {
+    if (forcePhase) return forcePhase;
+    if (!splashDone) return 'splash';
+    if (backend.status === 'checking') return 'splash'; // hold on splash while backend boots
+    if (backend.user) return 'app';
+    return 'onboarding';
+  })();
 
   const handleSignOut = async () => {
     await backend.logout();
-    setAppState('onboarding');
+    setForcePhase('onboarding');
   };
 
   return (
     <div className="min-h-dvh bg-[#F4FAF7] max-w-md mx-auto relative overflow-hidden">
-      {/* Backend status indicator (dev only) */}
+      {/* Backend status indicator */}
       {backend.status === 'offline' && (
         <div className="fixed top-0 left-0 right-0 z-[100] max-w-md mx-auto">
           <div className="bg-amber-500 text-white text-xs text-center py-1 px-3 font-medium">
@@ -38,13 +43,13 @@ function AppInner() {
       )}
 
       <AnimatePresence mode="wait">
-        {appState === 'splash' && (
+        {appPhase === 'splash' && (
           <motion.div key="splash" className="absolute inset-0" exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-            <SplashScreen onDone={() => setAppState('onboarding')} />
+            <SplashScreen onDone={() => setSplashDone(true)} />
           </motion.div>
         )}
 
-        {appState === 'onboarding' && (
+        {appPhase === 'onboarding' && (
           <motion.div
             key="onboarding"
             className="absolute inset-0"
@@ -54,13 +59,13 @@ function AppInner() {
             transition={{ duration: 0.3 }}
           >
             <OnboardingScreen
-              onGetStarted={() => setAppState('registration')}
-              onLogin={() => setAppState('registration')}
+              onGetStarted={() => setForcePhase('registration')}
+              onLogin={() => setForcePhase('registration')}
             />
           </motion.div>
         )}
 
-        {appState === 'registration' && (
+        {appPhase === 'registration' && (
           <motion.div
             key="registration"
             className="absolute inset-0"
@@ -70,13 +75,13 @@ function AppInner() {
             transition={{ type: 'spring', stiffness: 300, damping: 32 }}
           >
             <RegistrationFlow
-              onComplete={() => setAppState('app')}
+              onComplete={() => setForcePhase('app')}
               backend={backend}
             />
           </motion.div>
         )}
 
-        {appState === 'app' && (
+        {appPhase === 'app' && (
           <motion.div
             key="app"
             className="absolute inset-0"
