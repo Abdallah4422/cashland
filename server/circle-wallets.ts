@@ -41,7 +41,6 @@ async function getWalletSetId(): Promise<string> {
   const client = getClient();
   const res = await client.createWalletSet({
     name: 'Cashland User Wallets',
-    idempotencyKey: 'cashland-wallet-set-v1',
   });
 
   const setId = res.data?.walletSet?.id;
@@ -74,7 +73,6 @@ export async function createUserWallet(userId: bigint): Promise<string> {
     blockchains: [ARC_BLOCKCHAIN],
     count: 1,
     walletSetId,
-    idempotencyKey: `cashland-user-${String(userId)}-arc-v1`,
   });
 
   const wallet = res.data?.wallets?.[0];
