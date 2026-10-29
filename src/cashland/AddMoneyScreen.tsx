@@ -586,8 +586,13 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
   // Fetch Circle-managed wallet address from backend — retry up to 4x (wallet creation is async)
   const [circleAddress, setCircleAddress] = useState<string | null>(null);
   const [addressLoading, setAddressLoading] = useState(true);
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [fetchTick, setFetchTick] = useState(0);
+
   useEffect(() => {
     let cancelled = false;
+    setAddressLoading(true);
+    setWalletError(null);
     async function fetchWallet(attempt = 0) {
       try {
         const w = await accountApi.wallet();
@@ -596,25 +601,27 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
             setCircleAddress(w.address);
             setAddressLoading(false);
           } else if (attempt < 4) {
-            // Wallet creation is async — retry after 3s
             setTimeout(() => { if (!cancelled) fetchWallet(attempt + 1); }, 3000);
           } else {
             setAddressLoading(false);
+            setWalletError('pending');
           }
         }
-      } catch {
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
         if (!cancelled) {
           if (attempt < 4) {
             setTimeout(() => { if (!cancelled) fetchWallet(attempt + 1); }, 3000);
           } else {
             setAddressLoading(false);
+            setWalletError(msg);
           }
         }
       }
     }
     fetchWallet();
     return () => { cancelled = true; };
-  }, []);
+  }, [fetchTick]);
 
   // Prefer Circle wallet; fall back to connected wagmi wallet
   const depositAddress = circleAddress ?? (isConnected && wagmiAddress ? wagmiAddress : null);
@@ -696,9 +703,22 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
             </button>
           </div>
         ) : (
-          <div className="flex items-center justify-center px-3 py-3 rounded-xl mb-3 gap-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.15)' }}>
-            <Wallet size={14} style={{ color: 'rgba(255,255,255,0.35)' }} />
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>{addressLoading ? 'Setting up your wallet...' : 'Wallet unavailable — try again later'}</span>
+          <div className="flex flex-col gap-2 px-3 py-3 rounded-xl mb-3" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.15)' }}>
+            <div className="flex items-center gap-2">
+              <Wallet size={14} style={{ color: 'rgba(255,255,255,0.35)' }} />
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                {addressLoading ? 'Setting up your wallet...' : walletError === 'pending' ? 'Wallet is being created...' : (walletError ?? 'Wallet unavailable')}
+              </span>
+            </div>
+            {!addressLoading && (
+              <button
+                onClick={() => setFetchTick(t => t + 1)}
+                className="text-xs font-semibold py-1.5 px-3 rounded-lg self-start"
+                style={{ background: 'rgba(0,168,107,0.15)', color: 'var(--brand)' }}
+              >
+                Tap to retry
+              </button>
+            )}
           </div>
         )}
         {/* Simple QR placeholder */}
