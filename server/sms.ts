@@ -38,7 +38,7 @@ export async function sendSms(params: {
         from: process.env.TERMII_SENDER_ID ?? 'N-Alert',
         sms: params.message,
         type: 'plain',
-        channel: 'dnd',
+        channel: 'generic',
         api_key: apiKey,
       }),
     });

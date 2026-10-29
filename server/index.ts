@@ -110,8 +110,8 @@ async function handle(req: Request): Promise<Response> {
       return json({
         sent: true,
         provider: smsResult.provider,
-        // devCode is only returned when no SMS key is set — safe for development
-        ...(smsResult.provider === 'dev' && { devCode: result.devCode }),
+        // devCode returned when SMS is unavailable (dev mode or Termii send failed)
+        ...((smsResult.provider === 'dev' || !smsResult.sent) && { devCode: result.devCode }),
       });
     }
 
