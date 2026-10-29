@@ -583,15 +583,37 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
   const { address: wagmiAddress, isConnected } = useAccount();
   const { formattedNgn, usdcFloat, refetch } = useUsdcBalance();
 
-  // Fetch Circle-managed wallet address from backend
+  // Fetch Circle-managed wallet address from backend — retry up to 4x (wallet creation is async)
   const [circleAddress, setCircleAddress] = useState<string | null>(null);
   const [addressLoading, setAddressLoading] = useState(true);
   useEffect(() => {
-    accountApi.wallet().then(w => {
-      setCircleAddress(w.address ?? null);
-    }).catch(() => {
-      setCircleAddress(null);
-    }).finally(() => setAddressLoading(false));
+    let cancelled = false;
+    async function fetchWallet(attempt = 0) {
+      try {
+        const w = await accountApi.wallet();
+        if (!cancelled) {
+          if (w.address) {
+            setCircleAddress(w.address);
+            setAddressLoading(false);
+          } else if (attempt < 4) {
+            // Wallet creation is async — retry after 3s
+            setTimeout(() => { if (!cancelled) fetchWallet(attempt + 1); }, 3000);
+          } else {
+            setAddressLoading(false);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          if (attempt < 4) {
+            setTimeout(() => { if (!cancelled) fetchWallet(attempt + 1); }, 3000);
+          } else {
+            setAddressLoading(false);
+          }
+        }
+      }
+    }
+    fetchWallet();
+    return () => { cancelled = true; };
   }, []);
 
   // Prefer Circle wallet; fall back to connected wagmi wallet
@@ -676,7 +698,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
         ) : (
           <div className="flex items-center justify-center px-3 py-3 rounded-xl mb-3 gap-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.15)' }}>
             <Wallet size={14} style={{ color: 'rgba(255,255,255,0.35)' }} />
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>Connect a wallet to get your deposit address</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>{addressLoading ? 'Setting up your wallet...' : 'Wallet unavailable — try again later'}</span>
           </div>
         )}
         {/* Simple QR placeholder */}
