@@ -3,6 +3,7 @@
 // Falls back gracefully if the backend is offline (prototype-mode).
 
 import { useState, useEffect, useRef } from 'react';
+import { API_BASE_URL } from './config.js';
 import {
   auth as authApi, account as accountApi, transactions as txApi,
   lookup as lookupApi, kyc as kycApi, disputes as disputesApi,
@@ -80,8 +81,7 @@ export function useBackend(): BackendState & BackendActions {
   useEffect(() => {
     void (async () => {
       try {
-        const base: string = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
-        const res = await fetch(`${base}/health`);
+        const res = await fetch(`${API_BASE_URL}/health`);
         if (!res.ok) throw new Error('offline');
         setStatus('online');
         statusRef.current = 'online';
