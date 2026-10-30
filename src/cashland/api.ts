@@ -1,8 +1,8 @@
 // Cashland Phase 1 — Frontend API client
-// All calls go through /api/* which Vite proxies to the backend on port 3001.
+// The backend base URL is shared with the startup health check.
 // The session token is stored in localStorage alongside the session data.
 
-const BASE: string = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
+import { API_BASE_URL } from './config.js';
 
 function getToken(): string | null {
   try {
@@ -35,7 +35,7 @@ async function request<T>(
     const token = getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
   }
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
