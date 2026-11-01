@@ -187,3 +187,12 @@ CREATE TABLE IF NOT EXISTS app_config (
   key    TEXT PRIMARY KEY,
   value  TEXT NOT NULL
 );
+
+-- ─── ARC MAINNET USDC DEPOSIT SCANNER ─────────────────────────────────────────
+-- Cursor is initialized from ARC_DEPOSIT_SCAN_START_BLOCK only after an
+-- operator audits the intended historical start height.
+CREATE TABLE IF NOT EXISTS arc_deposit_scan_state (
+  id                 SMALLINT PRIMARY KEY CHECK (id = 1),
+  last_scanned_block BIGINT NOT NULL,
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

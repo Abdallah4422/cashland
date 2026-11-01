@@ -131,6 +131,8 @@ export interface ApiTransaction {
   type: string;
   status: string;
   amountNgn: number;
+  /** USDC in whole units (API converts from 6-decimal micro-USDC). */
+  amountUsdc: number;
   note: string | null;
   recipientName: string | null;
   recipientTag: string | null;

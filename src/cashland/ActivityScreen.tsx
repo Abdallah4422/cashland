@@ -42,17 +42,50 @@ const eventTypeBadge = (type: string) => {
   return colors[type] ?? { bg: 'rgba(107,114,128,0.15)', text: '#6B7280' };
 };
 
-export default function ActivityScreen({ liveTransactions: _liveTransactions }: { liveTransactions?: ApiTransaction[] }) {
+function toActivityTransaction(tx: ApiTransaction): DisputeTransaction {
+  const isUsdc = tx.amountUsdc > 0;
+  const name = tx.recipientName || tx.merchantName || (isUsdc ? 'USDC deposit' : 'Cashland transaction');
+  const initials = name.split(/\s+/).slice(0, 2).map(part => part[0] ?? '').join('').toUpperCase() || 'CL';
+  const createdAt = new Date(tx.createdAt);
+  const status: DisputeTransaction['status'] =
+    tx.status === 'pending' ? 'pending' :
+    tx.status === 'failed' ? 'failed' :
+    tx.txHash ? 'onchain' : 'success';
+
+  return {
+    id: tx.id,
+    name,
+    tag: tx.recipientTag ?? undefined,
+    type: tx.direction === 'out' ? 'sent' : tx.merchantName ? 'merchant' : 'received',
+    amount: tx.direction === 'out' ? -Math.abs(tx.amountNgn) : Math.abs(tx.amountNgn),
+    amountUsdc: isUsdc ? (tx.direction === 'out' ? -Math.abs(tx.amountUsdc) : Math.abs(tx.amountUsdc)) : undefined,
+    currency: isUsdc ? 'USDC' : 'NGN',
+    status,
+    time: Number.isNaN(createdAt.getTime()) ? 'Date unavailable' : createdAt.toLocaleString('en-NG'),
+    initials,
+    color: isUsdc ? '#2775CA' : tx.direction === 'out' ? '#F97316' : '#00A86B',
+    note: tx.note ?? undefined,
+    reference: tx.id,
+    txHash: tx.txHash ?? undefined,
+  };
+}
+
+export default function ActivityScreen({ liveTransactions }: { liveTransactions?: ApiTransaction[] }) {
   const [activeTab, setActiveTab] = useState<TabId>('mine');
   const [filter, setFilter] = useState<Filter>('All');
   const [selectedTx, setSelectedTx] = useState<DisputeTransaction | null>(null);
   const { events, stats } = useSocialFeed();
   const [showAll, setShowAll] = useState(false);
 
-  const filtered = allTransactions.filter(tx => {
+  // Use backend history whenever it is available; demo rows are only a prototype fallback.
+  const transactionRows = liveTransactions === undefined
+    ? allTransactions
+    : liveTransactions.map(toActivityTransaction);
+
+  const filtered = transactionRows.filter(tx => {
     if (filter === 'Sent') return tx.type === 'sent';
     if (filter === 'Received') return tx.type === 'received';
-    if (filter === 'Merchant') return tx.tag === 'Merchant';
+    if (filter === 'Merchant') return tx.type === 'merchant' || tx.tag === 'Merchant';
     return true;
   });
 
@@ -122,7 +155,14 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
 
             <div className="px-5">
               <div className="rounded-2xl overflow-hidden" style={darkCard}>
-                {filtered.map((tx, i) => (
+                {filtered.length === 0 ? (
+                  <div className="px-5 py-10 text-center">
+                    <p className="text-sm font-semibold text-white">No transactions yet</p>
+                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                      Your confirmed Cashland transactions and USDC deposits will appear here.
+                    </p>
+                  </div>
+                ) : filtered.map((tx, i) => (
                   <div key={tx.id}>
                     <button
                       className="w-full flex items-center gap-3 px-4 py-4 text-left transition-all"
@@ -148,14 +188,16 @@ export default function ActivityScreen({ liveTransactions: _liveTransactions }: 
                         <div className="flex items-center gap-1.5 mt-0.5">
                           {tx.status === 'onchain' && <CheckCircle2 size={11} style={{ color: '#00C47D' }} />}
                           <span className="text-xs" style={{ color: tx.status === 'onchain' ? '#00C47D' : 'rgba(255,255,255,0.40)' }}>
-                            {tx.status === 'onchain' ? 'Verified onchain' : 'Successful'}
+                            {tx.status === 'onchain' ? 'Verified onchain' : tx.status === 'pending' ? 'Pending' : tx.status === 'failed' ? 'Failed' : 'Successful'}
                           </span>
                           {tx.note && <span className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.30)' }}>· {tx.note}</span>}
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-bold tabular" style={{ color: tx.amount > 0 ? '#00C47D' : 'white' }}>
-                          {tx.amount > 0 ? '+' : ''}{formatNaira(tx.amount)}
+                        <p className="text-sm font-bold tabular" style={{ color: tx.currency === 'USDC' ? ((tx.amountUsdc ?? 0) > 0 ? '#00C47D' : 'white') : tx.amount > 0 ? '#00C47D' : 'white' }}>
+                          {tx.currency === 'USDC'
+                            ? `${(tx.amountUsdc ?? 0) > 0 ? '+' : ''}${Math.abs(tx.amountUsdc ?? 0).toLocaleString('en-US', { maximumFractionDigits: 6 })} USDC`
+                            : `${tx.amount > 0 ? '+' : ''}${formatNaira(tx.amount)}`}
                         </p>
                         <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{tx.time}</p>
                       </div>

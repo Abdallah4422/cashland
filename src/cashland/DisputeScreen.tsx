@@ -16,6 +16,8 @@ export interface DisputeTransaction {
   tag?: string;
   type: 'sent' | 'received' | 'merchant';
   amount: number;
+  amountUsdc?: number;
+  currency?: 'NGN' | 'USDC';
   status: 'onchain' | 'success' | 'pending' | 'failed';
   time: string;
   initials: string;
@@ -145,7 +147,9 @@ export default function DisputeScreen({ transaction: tx, onClose }: Props) {
                     </div>
                   </div>
                   <p className="text-3xl font-bold tabular mb-1" style={{ color: 'var(--ink)', letterSpacing: '-0.02em' }}>
-                    {tx.amount > 0 ? '+' : ''}{formatNaira(tx.amount)}
+                    {tx.currency === 'USDC'
+                      ? `${(tx.amountUsdc ?? 0) > 0 ? '+' : ''}${Math.abs(tx.amountUsdc ?? 0).toLocaleString('en-US', { maximumFractionDigits: 6 })} USDC`
+                      : `${tx.amount > 0 ? '+' : ''}${formatNaira(tx.amount)}`}
                   </p>
                   <p className="text-sm font-medium mb-2" style={{ color: 'var(--subtle)' }}>
                     {tx.type === 'sent' ? 'Sent to' : 'Received from'} {tx.name}
@@ -283,7 +287,9 @@ export default function DisputeScreen({ transaction: tx, onClose }: Props) {
                     <p className="text-xs" style={{ color: 'var(--subtle)' }}>{tx.time}</p>
                   </div>
                   <p className="text-sm font-bold tabular" style={{ color: tx.amount > 0 ? 'var(--brand)' : 'var(--ink)' }}>
-                    {tx.amount > 0 ? '+' : ''}{formatNaira(tx.amount)}
+                    {tx.currency === 'USDC'
+                      ? `${(tx.amountUsdc ?? 0) > 0 ? '+' : ''}${Math.abs(tx.amountUsdc ?? 0).toLocaleString('en-US', { maximumFractionDigits: 6 })} USDC`
+                      : `${tx.amount > 0 ? '+' : ''}${formatNaira(tx.amount)}`}
                   </p>
                 </div>
 

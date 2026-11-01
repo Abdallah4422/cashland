@@ -27,6 +27,7 @@ import { sendSms } from './sms.js';
 import { dojahVerifyBvn, dojahVerifyNin } from './dojah.js';
 import { getUserWallets } from './settlement.js';
 import { getFxRateMeta } from './fxrate.js';
+import { startArcDepositMonitor } from './arc-deposits.js';
 
 const PORT = 3001;
 
@@ -582,7 +583,7 @@ function serializeUser(u: {
 }
 
 function serializeTx(tx: {
-  id: string; type: string; status: string; amountNgn: bigint;
+  id: string; type: string; status: string; amountNgn: bigint; amountUsdc: bigint;
   note: string | null; recipientName: string | null; recipientTag: string | null;
   merchantName: string | null; txHash: string | null;
   createdAt: Date; completedAt: Date | null; direction: 'in' | 'out';
@@ -592,6 +593,7 @@ function serializeTx(tx: {
     type: tx.type,
     status: tx.status,
     amountNgn: Number(tx.amountNgn) / 100,
+    amountUsdc: Number(tx.amountUsdc) / 1_000_000,
     note: tx.note,
     recipientName: tx.recipientName,
     recipientTag: tx.recipientTag,
@@ -607,6 +609,7 @@ function serializeTx(tx: {
 
 await runMigrations();
 console.log('[server] Migrations complete');
+startArcDepositMonitor();
 
 Bun.serve({ port: PORT, fetch: handle });
 console.log(`[server] Cashland API running on http://localhost:${PORT}`);

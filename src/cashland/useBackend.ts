@@ -112,7 +112,10 @@ export function useBackend(): BackendState & BackendActions {
   const userId = user?.id;
   useEffect(() => {
     if (!userId) return;
-    pollRef.current = setInterval(() => { void doRefreshBalance(); }, POLL_INTERVAL);
+    pollRef.current = setInterval(() => {
+      void doRefreshBalance();
+      void doRefreshTransactions();
+    }, POLL_INTERVAL);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);

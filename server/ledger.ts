@@ -288,6 +288,7 @@ export interface TxRecord {
   type: string;
   status: string;
   amountNgn: bigint;
+  amountUsdc: bigint;
   note: string | null;
   recipientName: string | null;
   recipientTag: string | null;
@@ -300,13 +301,13 @@ export interface TxRecord {
 
 export async function getTransactions(userId: bigint, limit = 20, offset = 0): Promise<TxRecord[]> {
   const rows = await query<{
-    id: string; type: string; status: string; amount_ngn: string;
+    id: string; type: string; status: string; amount_ngn: string; amount_usdc: string | null;
     note: string | null; recipient_name: string | null; recipient_tag: string | null;
     merchant_name: string | null; tx_hash: string | null;
     created_at: Date; completed_at: Date | null;
     sender_id: string | null; recipient_id: string | null;
   }>(
-    `SELECT id, type, status, amount_ngn, note, recipient_name, recipient_tag,
+    `SELECT id, type, status, amount_ngn, amount_usdc, note, recipient_name, recipient_tag,
             merchant_name, tx_hash, created_at, completed_at, sender_id, recipient_id
      FROM transactions
      WHERE sender_id = $1 OR recipient_id = $1
@@ -319,6 +320,7 @@ export async function getTransactions(userId: bigint, limit = 20, offset = 0): P
     type: r.type,
     status: r.status,
     amountNgn: BigInt(r.amount_ngn),
+    amountUsdc: BigInt(r.amount_usdc ?? '0'),
     note: r.note,
     recipientName: r.recipient_name,
     recipientTag: r.recipient_tag,
