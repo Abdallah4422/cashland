@@ -27,6 +27,7 @@ import { sendSms } from './sms.js';
 import { dojahVerifyBvn, dojahVerifyNin } from './dojah.js';
 import { getUserWallets } from './settlement.js';
 import { getFxRateMeta } from './fxrate.js';
+import { startArcDepositMonitor } from './arc-deposits.js';
 
 const PORT = 3001;
 
@@ -607,6 +608,7 @@ function serializeTx(tx: {
 
 await runMigrations();
 console.log('[server] Migrations complete');
+startArcDepositMonitor();
 
 Bun.serve({ port: PORT, fetch: handle });
 console.log(`[server] Cashland API running on http://localhost:${PORT}`);
