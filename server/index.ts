@@ -583,7 +583,7 @@ function serializeUser(u: {
 }
 
 function serializeTx(tx: {
-  id: string; type: string; status: string; amountNgn: bigint;
+  id: string; type: string; status: string; amountNgn: bigint; amountUsdc: bigint;
   note: string | null; recipientName: string | null; recipientTag: string | null;
   merchantName: string | null; txHash: string | null;
   createdAt: Date; completedAt: Date | null; direction: 'in' | 'out';
@@ -593,6 +593,7 @@ function serializeTx(tx: {
     type: tx.type,
     status: tx.status,
     amountNgn: Number(tx.amountNgn) / 100,
+    amountUsdc: Number(tx.amountUsdc) / 1_000_000,
     note: tx.note,
     recipientName: tx.recipientName,
     recipientTag: tx.recipientTag,
