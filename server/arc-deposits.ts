@@ -44,11 +44,17 @@ async function creditVerifiedTransfer(params: {
   logIndex: number;
   blockNumber: bigint;
 }) {
-  const wallet = await queryOne<{ user_id: string }>(
-    `SELECT user_id FROM user_wallets WHERE lower(wallet_address) = lower($1) LIMIT 1`,
+  // A recipient address must resolve to exactly one Cashland user. Never
+  // guess with LIMIT 1: legacy/manual duplicate registrations must fail closed.
+  const walletMatches = await query<{ user_id: string }>(
+    `SELECT user_id FROM user_wallets WHERE lower(wallet_address) = lower($1) LIMIT 2`,
     [params.to]
   );
-  if (!wallet) return;
+  if (walletMatches.length === 0) return;
+  if (walletMatches.length !== 1) {
+    throw new Error('ARC_DEPOSIT_WALLET_OWNERSHIP_AMBIGUOUS');
+  }
+  const wallet = walletMatches[0];
 
   if (params.amount <= 0n || params.amount > 9_000_000_000_000_000_000n) {
     throw new Error('ARC_DEPOSIT_AMOUNT_OUT_OF_RANGE');
