@@ -161,7 +161,7 @@ async function scanOnce() {
 
     for (const log of logs) {
       if (!log.args.from || !log.args.to || log.args.value === undefined ||
-          !log.transactionHash || log.logIndex === null) {
+          !log.transactionHash || log.logIndex === null || log.blockNumber === null) {
         throw new Error('ARC_DEPOSIT_LOG_INCOMPLETE');
       }
       await creditVerifiedTransfer({
