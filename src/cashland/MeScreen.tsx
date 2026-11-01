@@ -34,7 +34,7 @@ export default function MeScreen({ onOpenTier, onSignOut, user: backendUser, kyc
   const [copied, setCopied] = useState(false);
   const session = loadSession();
   const displayName = backendUser ? `${backendUser.firstName} ${backendUser.lastName}` : session ? `${session.firstName} ${session.lastName}` : 'Musa Ibrahim';
-  const displayTag = session?.tag ?? '@musa';
+  const displayTag = backendUser?.tag || session?.tag || '@musa';
   const displayInitials = session ? (session.firstName[0] ?? 'M') + (session.lastName[0] ?? 'I') : 'MI';
   const displayPhone = session?.phone ? session.phone.slice(0, 3) + ' *** ' + session.phone.slice(-4) : '0803 *** 4567';
   const tierFromSession = (session?.kycTier ?? CURRENT_TIER) as number;
