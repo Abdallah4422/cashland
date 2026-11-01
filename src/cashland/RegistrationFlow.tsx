@@ -6,6 +6,7 @@ import { saveSession, hashPin } from './useUserSession';
 import type { BackendActions, BackendState } from './useBackend';
 
 interface Props {
+  mode?: 'register' | 'login';
   onComplete: () => void;
   backend?: BackendState & BackendActions;
 }
@@ -477,17 +478,21 @@ function KycStep({ onNext, onSkip }: { onNext: () => void; onSkip: () => void })
 interface PinStepProps {
   title: string;
   subtitle?: string;
-  onComplete: (pin: string) => void;
+  onComplete: (pin: string) => Promise<void> | void;
 }
 
 function PinStep({ title, subtitle, onComplete }: PinStepProps) {
   const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
 
   const handleDigit = (d: string) => {
     if (pin.length >= 6) return;
     const newPin = pin + d;
     setPin(newPin);
-    if (newPin.length === 6) setTimeout(() => onComplete(newPin), 300);
+    if (newPin.length === 6) setTimeout(async () => {
+      try { await onComplete(newPin); }
+      catch (e) { setError(e instanceof Error ? e.message : 'Unable to continue. Please try again.'); setPin(''); }
+    }, 300);
   };
 
   const handleDelete = () => setPin(p => p.slice(0, -1));
@@ -516,6 +521,8 @@ function PinStep({ title, subtitle, onComplete }: PinStepProps) {
           />
         ))}
       </div>
+
+      {error && <p className="text-xs text-center mb-4" style={{ color: '#f87171' }}>{error}</p>}
 
       <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto w-full">
         {digits.map((d, i) => (
@@ -584,7 +591,7 @@ function BiometricsStep({ onEnable, onSkip }: { onEnable: () => Promise<void>; o
 }
 
 // ── Orchestrator ───────────────────────────────────────────────
-export default function RegistrationFlow({ onComplete, backend }: Props) {
+export default function RegistrationFlow({ onComplete, backend, mode = 'register' }: Props) {
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
   const [devCode, setDevCode] = useState<string | undefined>();
@@ -664,7 +671,7 @@ export default function RegistrationFlow({ onComplete, backend }: Props) {
               phone={phone}
               devCode={devCode}
               verifyOtp={backend?.verifyOtp ?? (() => Promise.resolve(true))}
-              onNext={() => setStep('profile')}
+              onNext={() => setStep(mode === 'login' ? 'pin' : 'profile')}
             />}
             {step === 'profile' && (
               <ProfileStep onNext={(firstName, lastName, tag) => {
@@ -680,9 +687,15 @@ export default function RegistrationFlow({ onComplete, backend }: Props) {
             )}
             {step === 'pin' && (
               <PinStep
-                title="Create your PIN"
-                subtitle="Choose a 6-digit PIN to secure your account"
-                onComplete={p => { setPin(p); setStep('pin-confirm'); }}
+                title={mode === 'login' ? 'Enter your PIN' : 'Create your PIN'}
+                subtitle={mode === 'login' ? 'Enter the 6-digit PIN for your existing Cashland account' : 'Choose a 6-digit PIN to secure your account'}
+                onComplete={async p => {
+                  if (mode === 'login') {
+                    if (!backend || backend.status !== 'online') throw new Error('Cashland service is unavailable. Please try again shortly.');
+                    await backend.login(phone, p);
+                    onComplete();
+                  } else { setPin(p); setStep('pin-confirm'); }
+                }}
               />
             )}
             {step === 'pin-confirm' && (
@@ -690,7 +703,8 @@ export default function RegistrationFlow({ onComplete, backend }: Props) {
                 title="Confirm PIN"
                 subtitle="Enter your PIN once more to confirm"
                 onComplete={p => {
-                  if (p === pin || true) setStep('biometrics');
+                  if (p !== pin) throw new Error('PINs do not match. Please enter the PIN you created.');
+                  setStep('biometrics');
                 }}
               />
             )}
