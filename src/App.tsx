@@ -10,12 +10,14 @@ import { BackendProvider, useBackendContext } from './cashland/BackendContext';
 // 'splash-pending' = splash shown, backend still checking
 // 'splash-done'    = splash done, waiting for backend result
 type AppPhase = 'splash' | 'onboarding' | 'registration' | 'app';
+type AuthMode = 'register' | 'login';
 
 function AppInner() {
   const backend = useBackendContext();
   const [splashDone, setSplashDone] = useState(false);
   // Explicit override only used for registration→app and sign-out flows
   const [forcePhase, setForcePhase] = useState<AppPhase | null>(null);
+  const [authMode, setAuthMode] = useState<AuthMode>('register');
 
   // Derive current phase from state — no setState inside effects
   const appPhase: AppPhase = (() => {
@@ -59,8 +61,8 @@ function AppInner() {
             transition={{ duration: 0.3 }}
           >
             <OnboardingScreen
-              onGetStarted={() => setForcePhase('registration')}
-              onLogin={() => setForcePhase('registration')}
+              onGetStarted={() => { setAuthMode('register'); setForcePhase('registration'); }}
+              onLogin={() => { setAuthMode('login'); setForcePhase('registration'); }}
             />
           </motion.div>
         )}
@@ -75,6 +77,7 @@ function AppInner() {
             transition={{ type: 'spring', stiffness: 300, damping: 32 }}
           >
             <RegistrationFlow
+              mode={authMode}
               onComplete={() => setForcePhase('app')}
               backend={backend}
             />
