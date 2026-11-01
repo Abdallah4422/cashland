@@ -45,7 +45,7 @@ const eventTypeBadge = (type: string) => {
 function toActivityTransaction(tx: ApiTransaction): DisputeTransaction {
   const isUsdc = tx.amountUsdc > 0;
   const name = tx.recipientName || tx.merchantName || (isUsdc ? 'USDC deposit' : 'Cashland transaction');
-  const initials = name.split(/\\s+/).slice(0, 2).map(part => part[0] ?? '').join('').toUpperCase() || 'CL';
+  const initials = name.split(/\s+/).slice(0, 2).map(part => part[0] ?? '').join('').toUpperCase() || 'CL';
   const createdAt = new Date(tx.createdAt);
   const status: DisputeTransaction['status'] =
     tx.status === 'pending' ? 'pending' :
