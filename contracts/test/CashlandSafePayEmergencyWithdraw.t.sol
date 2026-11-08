@@ -71,15 +71,30 @@ contract CashlandSafePayEmergencyWithdrawTest is Test {
     function testEmergencyWithdrawRefundsActiveEscrowOnce() public {
         uint256 id = _create(buyer1, 100);
 
+        vm.expectEmit(true, true, false, true, address(escrow));
+        emit CashlandSafePay.PayoutCredited(id, buyer1, 100);
+        vm.expectEmit(true, true, false, true, address(escrow));
+        emit CashlandSafePay.EmergencyWithdraw(id, buyer1, 100);
         escrow.emergencyWithdraw(id);
 
+        // Pull model: nothing moved yet, the refund is only credited.
+        assertEq(token.balanceOf(buyer1), 900);
+        assertEq(token.balanceOf(address(escrow)), 100);
+        assertEq(escrow.claimable(buyer1), 100);
+        assertEq(escrow.totalClaimable(), 100);
+        assertEq(uint256(escrow.getSafePay(id).status), uint256(CashlandSafePay.SafePayStatus.Cancelled));
+
+        vm.prank(buyer1);
+        escrow.withdraw();
         assertEq(token.balanceOf(buyer1), 1_000);
         assertEq(token.balanceOf(address(escrow)), 0);
-        assertEq(uint256(escrow.getSafePay(id).status), uint256(CashlandSafePay.SafePayStatus.Cancelled));
+        assertEq(escrow.claimable(buyer1), 0);
+        assertEq(escrow.totalClaimable(), 0);
 
         vm.expectRevert(abi.encodeWithSelector(CashlandSafePay.SafePayAlreadyFinalized.selector, id));
         escrow.emergencyWithdraw(id);
         assertEq(token.balanceOf(address(escrow)), 0);
+        assertEq(escrow.totalClaimable(), 0);
     }
 
     function testRepeatedEmergencyWithdrawCannotDrainAnotherEscrow() public {
@@ -91,8 +106,17 @@ contract CashlandSafePayEmergencyWithdrawTest is Test {
         vm.expectRevert(abi.encodeWithSelector(CashlandSafePay.SafePayAlreadyFinalized.selector, firstId));
         escrow.emergencyWithdraw(firstId);
 
+        // Credit is not doubled; buyer1 can only ever pull 100.
+        assertEq(escrow.claimable(buyer1), 100);
+        assertEq(escrow.totalClaimable(), 100);
+        assertEq(token.balanceOf(address(escrow)), 300);
+
+        vm.prank(buyer1);
+        escrow.withdraw();
+
         assertEq(token.balanceOf(address(escrow)), 200);
         assertEq(token.balanceOf(buyer2), 800);
+        assertEq(escrow.claimable(buyer2), 0);
     }
 
     function testEmergencyWithdrawRejectsReleasedEscrow() public {
@@ -104,6 +128,12 @@ contract CashlandSafePayEmergencyWithdrawTest is Test {
         vm.expectRevert(abi.encodeWithSelector(CashlandSafePay.SafePayAlreadyFinalized.selector, id));
         escrow.emergencyWithdraw(id);
 
+        assertEq(escrow.claimable(seller), 100);
+        assertEq(escrow.claimable(buyer1), 0);
+        assertEq(escrow.totalClaimable(), 100);
+
+        vm.prank(seller);
+        escrow.withdraw();
         assertEq(token.balanceOf(seller), 100);
         assertEq(token.balanceOf(address(escrow)), 0);
     }
@@ -113,9 +143,17 @@ contract CashlandSafePayEmergencyWithdrawTest is Test {
 
         vm.prank(buyer1);
         escrow.raiseDispute(id);
+
+        vm.expectEmit(true, true, false, true, address(escrow));
+        emit CashlandSafePay.PayoutCredited(id, buyer1, 100);
         escrow.emergencyWithdraw(id);
 
-        assertEq(token.balanceOf(buyer1), 1_000);
+        assertEq(escrow.claimable(buyer1), 100);
+        assertEq(escrow.totalClaimable(), 100);
         assertEq(uint256(escrow.getSafePay(id).status), uint256(CashlandSafePay.SafePayStatus.Cancelled));
+
+        vm.prank(buyer1);
+        escrow.withdraw();
+        assertEq(token.balanceOf(buyer1), 1_000);
     }
 }

@@ -88,6 +88,8 @@ contract CashlandSafePayAutoReleaseTest is Test {
         vm.expectRevert(abi.encodeWithSelector(CashlandSafePay.SellerNotEngaged.selector, id));
         escrow.triggerAutoRelease(id);
         assertEq(token.balanceOf(seller), 0);
+        assertEq(escrow.claimable(seller), 0);
+        assertEq(escrow.totalClaimable(), 0);
         assertEq(token.balanceOf(address(escrow)), AMOUNT);
         assertEq(uint256(_status(id)), uint256(CashlandSafePay.SafePayStatus.Active));
     }
@@ -114,6 +116,11 @@ contract CashlandSafePayAutoReleaseTest is Test {
         escrow.triggerAutoRelease(id);
         vm.expectRevert(abi.encodeWithSelector(CashlandSafePay.SafePayNotActive.selector, id));
         escrow.triggerAutoRelease(id);
+        // Credited once; the failed second trigger did not double-credit.
+        assertEq(escrow.claimable(seller), AMOUNT);
+        assertEq(escrow.totalClaimable(), AMOUNT);
+        vm.prank(seller);
+        escrow.withdraw();
         assertEq(token.balanceOf(seller), AMOUNT);
     }
 
@@ -124,15 +131,28 @@ contract CashlandSafePayAutoReleaseTest is Test {
         _engage(id);
         vm.warp(deadline + 1);
 
+        vm.expectEmit(true, true, false, true, address(escrow));
+        emit CashlandSafePay.PayoutCredited(id, seller, AMOUNT);
         vm.expectEmit(true, true, true, true, address(escrow));
         emit CashlandSafePay.FundsReleased(id, buyer, seller, AMOUNT);
         vm.prank(stranger); // permissionless
         escrow.triggerAutoRelease(id);
 
+        // Credited, not yet paid.
+        assertEq(token.balanceOf(seller), 0);
+        assertEq(token.balanceOf(address(escrow)), AMOUNT);
+        assertEq(escrow.claimable(seller), AMOUNT);
+        assertEq(escrow.totalClaimable(), AMOUNT);
+        assertEq(uint256(_status(id)), uint256(CashlandSafePay.SafePayStatus.Released));
+
+        // Seller (not the stranger who triggered it) pulls the funds.
+        vm.prank(seller);
+        escrow.withdraw();
         assertEq(token.balanceOf(seller), AMOUNT);
         assertEq(token.balanceOf(buyer), START_BAL - AMOUNT);
         assertEq(token.balanceOf(address(escrow)), 0);
-        assertEq(uint256(_status(id)), uint256(CashlandSafePay.SafePayStatus.Released));
+        assertEq(escrow.claimable(seller), 0);
+        assertEq(escrow.totalClaimable(), 0);
     }
 
     function test_TriggerAutoReleasePaysEngagedSellerExactlyAtDeadline() public {
@@ -140,6 +160,9 @@ contract CashlandSafePayAutoReleaseTest is Test {
         _engage(id);
         vm.warp(deadline);
         escrow.triggerAutoRelease(id);
+        assertEq(escrow.claimable(seller), AMOUNT);
+        vm.prank(seller);
+        escrow.withdraw();
         assertEq(token.balanceOf(seller), AMOUNT);
     }
 
@@ -192,13 +215,23 @@ contract CashlandSafePayAutoReleaseTest is Test {
         vm.warp(deadline + 7 days);
 
         vm.expectEmit(true, true, false, true, address(escrow));
+        emit CashlandSafePay.PayoutCredited(id, buyer, AMOUNT);
+        vm.expectEmit(true, true, false, true, address(escrow));
         emit CashlandSafePay.SafePayCancelled(id, buyer, AMOUNT);
         vm.prank(buyer);
         escrow.cancelSafePay(id);
 
+        assertEq(escrow.claimable(buyer), AMOUNT);
+        assertEq(escrow.totalClaimable(), AMOUNT);
+        assertEq(token.balanceOf(buyer), START_BAL - AMOUNT);
+        assertEq(token.balanceOf(address(escrow)), AMOUNT);
+
+        vm.prank(buyer);
+        escrow.withdraw();
         assertEq(token.balanceOf(buyer), START_BAL);
         assertEq(token.balanceOf(address(escrow)), 0);
         assertEq(token.balanceOf(seller), 0);
+        assertEq(escrow.totalClaimable(), 0);
         assertEq(uint256(_status(id)), uint256(CashlandSafePay.SafePayStatus.Cancelled));
     }
 
@@ -333,6 +366,9 @@ contract CashlandSafePayAutoReleaseTest is Test {
         // New owner has the rights.
         vm.prank(newOwner);
         escrow.emergencyWithdraw(id);
+        assertEq(escrow.claimable(buyer), AMOUNT);
+        vm.prank(buyer);
+        escrow.withdraw();
         assertEq(token.balanceOf(buyer), START_BAL);
     }
 
@@ -358,14 +394,22 @@ contract CashlandSafePayAutoReleaseTest is Test {
         vm.warp(deadline + warpBy);
         if (engaged) {
             escrow.triggerAutoRelease(id);
+            assertEq(escrow.claimable(seller), AMOUNT);
+            assertEq(token.balanceOf(seller), 0);
+            vm.prank(seller);
+            escrow.withdraw();
             assertEq(token.balanceOf(seller), AMOUNT);
         } else {
             vm.expectRevert(abi.encodeWithSelector(CashlandSafePay.SellerNotEngaged.selector, id));
             escrow.triggerAutoRelease(id);
             vm.prank(buyer);
             escrow.cancelSafePay(id);
+            assertEq(escrow.claimable(buyer), AMOUNT);
+            vm.prank(buyer);
+            escrow.withdraw();
             assertEq(token.balanceOf(buyer), START_BAL);
         }
+        assertEq(escrow.totalClaimable(), 0);
         assertEq(token.balanceOf(address(escrow)), 0);
     }
 }

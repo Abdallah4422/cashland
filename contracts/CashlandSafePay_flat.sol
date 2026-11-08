@@ -881,6 +881,9 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
 
     mapping(uint256 safePayId => SafePay safePay) private _safePays;
 
+    mapping(address => uint256) public claimable;
+    uint256 public totalClaimable;
+
     error ZeroAddress();
     error ZeroAmount();
     error InvalidDeadline();
@@ -892,7 +895,10 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
     error DeadlinePassed(uint256 safePayId);
     error DeadlineNotReached(uint256 safePayId);
     error SellerAlreadyEngaged(uint256 safePayId);
+    error SellerNotEngaged(uint256 safePayId);
     error CannotRenounceOwnership();
+    error SafePayAlreadyFinalized(uint256 safePayId);
+    error NothingToWithdraw();
 
     event SafePayCreated(
         uint256 indexed id,
@@ -907,6 +913,8 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
     event DisputeResolved(uint256 indexed id, bool releasedToSeller, address indexed resolver);
     event SafePayCancelled(uint256 indexed id, address indexed buyer, uint256 amount);
     event EmergencyWithdraw(uint256 indexed id, address indexed buyer, uint256 amount);
+    event PayoutCredited(uint256 indexed id, address indexed account, uint256 amount);
+    event Withdrawn(address indexed account, uint256 amount);
 
     constructor(address usdcToken_, address initialOwner) Ownable(initialOwner) {
         if (usdcToken_ == address(0) || initialOwner == address(0)) revert ZeroAddress();
@@ -950,6 +958,9 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
 
         if (safePay.seller != msg.sender) revert NotSafePaySeller(safePayId, msg.sender);
         if (safePay.status != SafePayStatus.Active) revert SafePayNotActive(safePayId);
+        // A seller cannot engage after the deadline, otherwise they could lock out the
+        // buyer's cancel right and immediately trigger auto-release.
+        if (block.timestamp >= safePay.deadline) revert DeadlinePassed(safePayId);
 
         safePay.sellerEngaged = true;
     }
@@ -961,7 +972,7 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
         if (safePay.status != SafePayStatus.Active) revert SafePayNotActive(safePayId);
 
         safePay.status = SafePayStatus.Released;
-        usdcToken.safeTransfer(safePay.seller, safePay.amount);
+        _creditPayout(safePayId, safePay.seller, safePay.amount);
 
         emit FundsReleased(safePayId, safePay.buyer, safePay.seller, safePay.amount);
     }
@@ -983,9 +994,12 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
 
         if (safePay.status != SafePayStatus.Active) revert SafePayNotActive(safePayId);
         if (block.timestamp < safePay.deadline) revert DeadlineNotReached(safePayId);
+        // Funds auto-release only to a seller who engaged in time. An unengaged escrow
+        // stays with the buyer, who can cancel it at any time.
+        if (!safePay.sellerEngaged) revert SellerNotEngaged(safePayId);
 
         safePay.status = SafePayStatus.Released;
-        usdcToken.safeTransfer(safePay.seller, safePay.amount);
+        _creditPayout(safePayId, safePay.seller, safePay.amount);
 
         emit FundsReleased(safePayId, safePay.buyer, safePay.seller, safePay.amount);
     }
@@ -997,11 +1011,11 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
 
         if (releaseToSeller) {
             safePay.status = SafePayStatus.Released;
-            usdcToken.safeTransfer(safePay.seller, safePay.amount);
+            _creditPayout(safePayId, safePay.seller, safePay.amount);
             emit FundsReleased(safePayId, safePay.buyer, safePay.seller, safePay.amount);
         } else {
             safePay.status = SafePayStatus.Cancelled;
-            usdcToken.safeTransfer(safePay.buyer, safePay.amount);
+            _creditPayout(safePayId, safePay.buyer, safePay.amount);
             emit SafePayCancelled(safePayId, safePay.buyer, safePay.amount);
         }
 
@@ -1016,7 +1030,7 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
         if (safePay.sellerEngaged) revert SellerAlreadyEngaged(safePayId);
 
         safePay.status = SafePayStatus.Cancelled;
-        usdcToken.safeTransfer(safePay.buyer, safePay.amount);
+        _creditPayout(safePayId, safePay.buyer, safePay.amount);
 
         emit SafePayCancelled(safePayId, safePay.buyer, safePay.amount);
     }
@@ -1024,15 +1038,43 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
     function emergencyWithdraw(uint256 safePayId) external onlyOwner nonReentrant {
         SafePay storage safePay = _safePayOrRevert(safePayId);
 
+        // Emergency refunds are allowed only while funds are still escrowed.
+        // Never pay out an escrow a second time after release or cancellation.
+        if (safePay.status != SafePayStatus.Active && safePay.status != SafePayStatus.Disputed) {
+            revert SafePayAlreadyFinalized(safePayId);
+        }
+
         safePay.status = SafePayStatus.Cancelled;
-        usdcToken.safeTransfer(safePay.buyer, safePay.amount);
+        _creditPayout(safePayId, safePay.buyer, safePay.amount);
 
         emit EmergencyWithdraw(safePayId, safePay.buyer, safePay.amount);
+    }
+
+    /// @notice Pull payouts separately so a USDC-blocklisted recipient cannot prevent settlement.
+    /// @dev Pays only the caller; a failed transfer reverts and preserves their credit.
+    function withdraw() external nonReentrant returns (uint256 amount) {
+        amount = claimable[msg.sender];
+        if (amount == 0) revert NothingToWithdraw();
+
+        claimable[msg.sender] = 0;
+        totalClaimable -= amount;
+
+        usdcToken.safeTransfer(msg.sender, amount);
+
+        emit Withdrawn(msg.sender, amount);
     }
 
     function getSafePay(uint256 safePayId) external view returns (SafePay memory safePay) {
         safePay = _safePays[safePayId];
         if (safePay.buyer == address(0)) revert SafePayNotFound(safePayId);
+    }
+
+    /// @dev Converts finalized escrow into a pull-payment liability without transferring USDC.
+    function _creditPayout(uint256 safePayId, address account, uint256 amount) internal {
+        claimable[account] += amount;
+        totalClaimable += amount;
+
+        emit PayoutCredited(safePayId, account, amount);
     }
 
     function _safePayOrRevert(uint256 safePayId) internal view returns (SafePay storage safePay) {

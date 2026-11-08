@@ -22,7 +22,8 @@ Cashland is a Nigerian-first onchain payment wallet. Users send and receive mone
 - Deploy block: 712068 (sent to the CREATE2 proxy 0x4e59b44847b379578588920ca78fbf26c0b4956c)
 - Deploying wallet (tx sender): `0xe89410922a00401a849b2c9661dccc4577ad3ad4` (confirm against Circle Console)
 - On-chain owner: `0x5B12Ce46C7194aD57d143bC22847224047b1Ef42` (shared Arc Studio platform wallet, NOT controlled by the project team)
-- OPEN ISSUE: nobody on the team can call owner-only functions (dispute resolution, emergencyWithdraw, transferOwnership) on this contract. Redeploy `contracts/CashlandSafePay_flat.sol` with constructor args (USDC `0x3600000000000000000000000000000000000000`, initialOwner = a wallet the team controls), then update this file, README.md and the app. Do this before real funds are locked in SafePay.
+- REDEPLOY READY (not yet deployed): redesigned contract (pull payments, owner `0x8F416268f542CC64ADBC31555113ddbC6BdFE2CD`, engagement-gated auto-release, emergency-withdraw guard). Steps and constructor values: `docs/safepay-redeploy.md`. After deploying, update `SAFEPAY_CONTRACT_ADDRESS` in `src/cashland/SafePayScreen.tsx`, README.md and this file, and mark the old contract superseded.
+- OPEN ISSUE (old contract): nobody on the team can call owner-only functions (dispute resolution, emergencyWithdraw, transferOwnership) on this contract. Redeploy `contracts/CashlandSafePay_flat.sol` with constructor args (USDC `0x3600000000000000000000000000000000000000`, initialOwner = a wallet the team controls), then update this file, README.md and the app. Do this before real funds are locked in SafePay.
 
 | Contract | Network | Address | Explorer |
 |---|---|---|---|
