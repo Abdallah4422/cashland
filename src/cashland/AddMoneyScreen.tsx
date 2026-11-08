@@ -591,8 +591,6 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
 
   useEffect(() => {
     let cancelled = false;
-    setAddressLoading(true);
-    setWalletError(null);
     async function fetchWallet(attempt = 0) {
       try {
         const w = await accountApi.wallet();
@@ -601,7 +599,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
             setCircleAddress(w.address);
             setAddressLoading(false);
           } else if (attempt < 4) {
-            setTimeout(() => { if (!cancelled) fetchWallet(attempt + 1); }, 3000);
+            setTimeout(() => { if (!cancelled) void fetchWallet(attempt + 1); }, 3000);
           } else {
             setAddressLoading(false);
             setWalletError('pending');
@@ -611,7 +609,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
         const msg = e instanceof Error ? e.message : String(e);
         if (!cancelled) {
           if (attempt < 4) {
-            setTimeout(() => { if (!cancelled) fetchWallet(attempt + 1); }, 3000);
+            setTimeout(() => { if (!cancelled) void fetchWallet(attempt + 1); }, 3000);
           } else {
             setAddressLoading(false);
             setWalletError(msg);
@@ -619,7 +617,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
         }
       }
     }
-    fetchWallet();
+    void fetchWallet();
     return () => { cancelled = true; };
   }, [fetchTick]);
 
@@ -712,7 +710,7 @@ function UsdcDepositFlow({ onBack, onSuccess }: { onBack: () => void; onSuccess:
             </div>
             {!addressLoading && (
               <button
-                onClick={() => setFetchTick(t => t + 1)}
+                onClick={() => { setAddressLoading(true); setWalletError(null); setFetchTick(t => t + 1); }}
                 className="text-xs font-semibold py-1.5 px-3 rounded-lg self-start"
                 style={{ background: 'rgba(0,168,107,0.15)', color: 'var(--brand)' }}
               >

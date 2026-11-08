@@ -489,9 +489,11 @@ function PinStep({ title, subtitle, onComplete }: PinStepProps) {
     if (pin.length >= 6) return;
     const newPin = pin + d;
     setPin(newPin);
-    if (newPin.length === 6) setTimeout(async () => {
-      try { await onComplete(newPin); }
-      catch (e) { setError(e instanceof Error ? e.message : 'Unable to continue. Please try again.'); setPin(''); }
+    if (newPin.length === 6) setTimeout(() => {
+      void (async () => {
+        try { await onComplete(newPin); }
+        catch (e) { setError(e instanceof Error ? e.message : 'Unable to continue. Please try again.'); setPin(''); }
+      })();
     }, 300);
   };
 
