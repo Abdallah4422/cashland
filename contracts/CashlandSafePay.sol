@@ -47,6 +47,7 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
     error DeadlineNotReached(uint256 safePayId);
     error SellerAlreadyEngaged(uint256 safePayId);
     error CannotRenounceOwnership();
+    error SafePayAlreadyFinalized(uint256 safePayId);
 
     event SafePayCreated(
         uint256 indexed id,
@@ -177,6 +178,12 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
 
     function emergencyWithdraw(uint256 safePayId) external onlyOwner nonReentrant {
         SafePay storage safePay = _safePayOrRevert(safePayId);
+
+        // Emergency refunds are allowed only while funds are still escrowed.
+        // Never pay out an escrow a second time after release or cancellation.
+        if (safePay.status != SafePayStatus.Active && safePay.status != SafePayStatus.Disputed) {
+            revert SafePayAlreadyFinalized(safePayId);
+        }
 
         safePay.status = SafePayStatus.Cancelled;
         usdcToken.safeTransfer(safePay.buyer, safePay.amount);
