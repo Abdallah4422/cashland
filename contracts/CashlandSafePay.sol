@@ -46,6 +46,7 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
     error DeadlinePassed(uint256 safePayId);
     error DeadlineNotReached(uint256 safePayId);
     error SellerAlreadyEngaged(uint256 safePayId);
+    error SellerNotEngaged(uint256 safePayId);
     error CannotRenounceOwnership();
     error SafePayAlreadyFinalized(uint256 safePayId);
 
@@ -105,6 +106,9 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
 
         if (safePay.seller != msg.sender) revert NotSafePaySeller(safePayId, msg.sender);
         if (safePay.status != SafePayStatus.Active) revert SafePayNotActive(safePayId);
+        // A seller cannot engage after the deadline, otherwise they could lock out the
+        // buyer's cancel right and immediately trigger auto-release.
+        if (block.timestamp >= safePay.deadline) revert DeadlinePassed(safePayId);
 
         safePay.sellerEngaged = true;
     }
@@ -138,6 +142,9 @@ contract CashlandSafePay is Ownable2Step, ReentrancyGuard {
 
         if (safePay.status != SafePayStatus.Active) revert SafePayNotActive(safePayId);
         if (block.timestamp < safePay.deadline) revert DeadlineNotReached(safePayId);
+        // Funds auto-release only to a seller who engaged in time. An unengaged escrow
+        // stays with the buyer, who can cancel it at any time.
+        if (!safePay.sellerEngaged) revert SellerNotEngaged(safePayId);
 
         safePay.status = SafePayStatus.Released;
         usdcToken.safeTransfer(safePay.seller, safePay.amount);
